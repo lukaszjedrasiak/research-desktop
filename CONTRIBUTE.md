@@ -4,7 +4,7 @@
 
 * feat: new feature
 * fix: bug fix
-* chore
+* chore: maintenance, dependencies, etc
 * refactor
 * docs
 * style
