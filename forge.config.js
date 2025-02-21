@@ -55,7 +55,7 @@ module.exports = {
           owner: 'lukaszjedrasiak',
           name: 'research-desktop'
         },
-        prerelease: false,
+        prerelease: true,
         draft: true
       }
     }

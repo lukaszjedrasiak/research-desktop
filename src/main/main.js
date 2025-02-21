@@ -1,7 +1,8 @@
-const { app, BrowserWindow } = require('electron');
+const { app, ipcMain, BrowserWindow } = require('electron');
 const { updateElectronApp } = require('update-electron-app');
-updateElectronApp();
+const path = require('path');
 
+updateElectronApp();
 
 // prevent duplicate launches when installing
 if (require("electron-squirrel-startup")) {
@@ -12,6 +13,7 @@ const createWindow = () => {
     const win = new BrowserWindow({
         show: false,
         webPreferences: {
+            preload: path.join(__dirname, 'preload.js'),
             contextIsolation: true,
             nodeIntegration: false
         }
@@ -31,3 +33,7 @@ const createWindow = () => {
 app.whenReady().then(() => {
     createWindow()
 })
+
+ipcMain.handle('get-app-version', () => {
+    return app.getVersion();
+});
