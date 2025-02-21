@@ -16,8 +16,8 @@ const createWindow = () => {
     // open dev tools
     win.webContents.openDevTools({
         mode: 'dock',
-        activate: true,
-});
+        activate: true
+    });
 }
 
 app.whenReady().then(() => {
