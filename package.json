@@ -1,8 +1,9 @@
 {
   "name": "research-desktop",
   "version": "0.0.1",
-  "main": "main.js",
+  "main": "src/main/main.js",
   "scripts": {
+    "start": "electron .",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "Lukasz Jedrasiak",
