@@ -1,5 +1,12 @@
-const { app, BrowserWindow } = require('electron')
-//require('update-electron-app')()
+const { app, BrowserWindow } = require('electron');
+const { updateElectronApp } = require('update-electron-app');
+updateElectronApp();
+
+
+// prevent duplicate launches when installing
+if (require("electron-squirrel-startup")) {
+    app.quit();
+  }
 
 const createWindow = () => {
     const win = new BrowserWindow({

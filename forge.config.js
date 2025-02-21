@@ -9,7 +9,13 @@ module.exports = {
   makers: [
     {
       name: '@electron-forge/maker-squirrel',
-      config: {},
+      config: {
+        name: 'research-desktop',
+        setupExe: 'research-desktop.exe',
+        setupIcon: 'public/icon.ico',
+        shortcutName: 'Research Desktop',
+        noMsi: true
+      },
     },
     {
       name: '@electron-forge/maker-zip',
