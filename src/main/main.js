@@ -2,6 +2,9 @@ const { app, ipcMain, BrowserWindow } = require('electron');
 const { updateElectronApp } = require('update-electron-app');
 const path = require('path');
 
+// internal imports
+const { createMenu } = require('./menu');
+
 app.setAppUserModelId('com.squirrel.jedrasiak-research-desktop.JedrasiakResearchDesktop');
 updateElectronApp();
 
@@ -33,7 +36,8 @@ const createWindow = () => {
 }
 
 app.whenReady().then(() => {
-    createWindow()
+    createWindow();
+    createMenu();
 })
 
 ipcMain.handle('get-app-version', () => {
