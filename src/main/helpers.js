@@ -1,5 +1,11 @@
 const yaml = require('yaml');
 
+async function extractYaml(content) {
+    const regex = /---\n([\s\S]*?)\n---/;
+    const match = content.match(regex);
+    return match ? match[1] : null;
+}
+
 async function parseYaml(yamlContent) {
     try {
         const parsed = yaml.parse(yamlContent);
@@ -21,6 +27,7 @@ async function validateSchema(schema, data) {
 }
 
 module.exports = {
+    extractYaml,
     parseYaml,
     validateSchema
 };
