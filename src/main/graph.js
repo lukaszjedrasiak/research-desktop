@@ -1,6 +1,7 @@
 const { dialog } = require('electron');
 const fs = require('fs').promises;
 const path = require('path');
+const yaml = require('yaml');
 
 let currentGraphPath = null;
 let currentGraphItems = null;
@@ -47,7 +48,21 @@ async function graphOpen() {
             });
             return;
         }
-        
+
+        const researchFolderGraphYaml = path.join(researchFolder, 'graph.yaml');
+        const researchFolderGraphYamlContentRaw = await fs.readFile(researchFolderGraphYaml, 'utf8');
+        const researchFolderGraphYamlContentParsed = await parseYaml(researchFolderGraphYamlContentRaw);
+
+        if (!researchFolderGraphYamlContentParsed) {
+            dialog.showMessageBox({
+                title: 'Warning',
+                message: 'The graph.yaml file is not a valid YAML object.',
+                type: 'warning'
+            });
+            return;
+        }
+
+        console.log(researchFolderGraphYamlContentParsed);
 
     } catch (error) {
         console.error('Error validating .research folder:', error);
@@ -109,6 +124,18 @@ function getCurrentGraphPath() {
 
 function getCurrentGraphItems() {
     return currentGraphItems;
+}
+
+async function parseYaml(yamlContent) {
+    try {
+        const parsed = yaml.parse(yamlContent);
+        if (!parsed || typeof parsed !== 'object') {
+            return null;
+        }
+        return parsed;
+    } catch (error) {
+        return null;
+    }
 }
 
 module.exports = { graphOpen, getCurrentGraphPath, getCurrentGraphItems };
