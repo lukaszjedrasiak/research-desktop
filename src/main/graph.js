@@ -6,7 +6,7 @@ const chalk = require('chalk');
 // internal imports
 const { SCHEMA_GRAPH_YAML } = require('./schemas');
 const { processVertices } = require('./vertices');
-const { parseYaml } = require('./helpers');
+const { parseYaml, validateSchema } = require('./helpers');
 
 chalk.level = 2;
 
@@ -155,17 +155,6 @@ async function isFolder(folderPath, item) {
     const itemStats = await fs.stat(itemPath);
     return itemStats.isDirectory();
 }
-
-async function validateSchema(schema, data) {
-    const result = schema.safeParse(data);
-    if (!result.success) {
-        return false;
-    }
-    return true;
-}
-
-// parsers
-
 
 // getters & setters
 function getGraph() {
