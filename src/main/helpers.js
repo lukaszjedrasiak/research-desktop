@@ -12,6 +12,15 @@ async function parseYaml(yamlContent) {
     }
 }
 
+async function validateSchema(schema, data) {
+    const result = schema.safeParse(data);
+    if (!result.success) {
+        return false;
+    }
+    return true;
+}
+
 module.exports = {
-    parseYaml
+    parseYaml,
+    validateSchema
 };
