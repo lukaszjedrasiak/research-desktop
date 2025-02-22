@@ -1,4 +1,4 @@
-const { dialog } = require('electron');
+const { BrowserWindow, dialog } = require('electron');
 const fs = require('fs').promises;
 const path = require('path');
 const yaml = require('yaml');
@@ -115,6 +115,8 @@ async function graphOpen() {
         });
 
         console.log(chalk.magenta(JSON.stringify(oGraph.get(), null, 2)));
+        const mainWindow = BrowserWindow.getFocusedWindow();
+        mainWindow.loadFile('src/pages/preview/index.html');
 
         return oGraph.get();
     } catch (error) {
