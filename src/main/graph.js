@@ -2,21 +2,57 @@ const { dialog } = require('electron');
 const fs = require('fs').promises;
 const path = require('path');
 const yaml = require('yaml');
+const chalk = require('chalk');
 
+// internal imports
+const { SCHEMA_GRAPH_YAML } = require('./schemas');
+
+chalk.level = 2;
 let currentGraphPath = null;
 let currentGraphItems = null;
 
+// global graph object definition
+const oGraph = {
+    data: null,
+    
+    // Setters
+    set: function(graphData) {
+        this.data = graphData;
+    },
+    
+    update: function(updates) {
+        if (!this.data) return;
+        this.data = { ...this.data, ...updates };
+    },
+    
+    clear: function() {
+        this.data = null;
+    },
+    
+    // Getters
+    get: function() {
+        return this.data;
+    }
+};
+
 // main function
 async function graphOpen() {
+    oGraph.clear();
+    currentGraphItems = null;
+    
     const graphPath = await graphSelect();
-    console.log(`path: ${path}`);
+    console.log(chalk.blue(`# graphOpen()`))
+    console.log(`path: ${graphPath}`);
     console.log(`currentGraphPath: ${currentGraphPath}`);
 
-    if (!graphPath) return;
+    if (!graphPath) {
+        currentGraphPath = null;
+        return null;
+    }
     
     // process the graph
     const graphItems = await graphRead(graphPath);
-    console.log(graphItems);
+    console.log(`graphItems: ${graphItems}`);
 
     try {
         if (!graphItems.includes('.research')) {
@@ -62,8 +98,25 @@ async function graphOpen() {
             return;
         }
 
-        console.log(researchFolderGraphYamlContentParsed);
+        // schema validation
+        if (!(await validateSchema(SCHEMA_GRAPH_YAML, researchFolderGraphYamlContentParsed))) {
+            dialog.showMessageBox({
+                title: 'Warning',
+                message: 'The graph.yaml file does not match the required schema.',
+                type: 'warning'
+            });
+            return;
+        }
 
+        // set graph object
+        oGraph.set({
+            path: path.normalize(currentGraphPath),
+            language: researchFolderGraphYamlContentParsed.language || 'en'
+        });
+
+        console.log(chalk.magenta(JSON.stringify(oGraph.get(), null, 2)));
+
+        return oGraph.get();
     } catch (error) {
         console.error('Error validating .research folder:', error);
         dialog.showMessageBox({
@@ -107,25 +160,21 @@ async function graphRead(path) {
 }
 
 // validators
-function itemExists(items, itemName) {
-    return items.includes(itemName);
-}
-
 async function isFolder(item) {
     const itemPath = path.join(currentGraphPath, item);
     const itemStats = await fs.stat(itemPath);
     return itemStats.isDirectory();
 }
 
-// getters
-function getCurrentGraphPath() {
-    return currentGraphPath;
+async function validateSchema(schema, data) {
+    const result = schema.safeParse(data);
+    if (!result.success) {
+        return false;
+    }
+    return true;
 }
 
-function getCurrentGraphItems() {
-    return currentGraphItems;
-}
-
+// parsers
 async function parseYaml(yamlContent) {
     try {
         const parsed = yaml.parse(yamlContent);
@@ -138,4 +187,33 @@ async function parseYaml(yamlContent) {
     }
 }
 
-module.exports = { graphOpen, getCurrentGraphPath, getCurrentGraphItems };
+// getters
+function getCurrentGraphPath() {
+    return currentGraphPath;
+}
+
+function getCurrentGraphItems() {
+    return currentGraphItems;
+}
+
+function getGraph() {
+    return oGraph.get();
+}
+
+// setters
+function updateGraph(updates) {
+    return oGraph.update(updates);
+}
+
+function clearGraph() {
+    oGraph.clear();
+}
+
+module.exports = { 
+    graphOpen, 
+    getCurrentGraphPath, 
+    getCurrentGraphItems,
+    getGraph,
+    updateGraph,
+    clearGraph 
+};
