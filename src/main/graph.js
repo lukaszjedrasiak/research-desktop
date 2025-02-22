@@ -6,6 +6,7 @@ const chalk = require('chalk');
 // internal imports
 const { SCHEMA_GRAPH_YAML } = require('./schemas');
 const { processVertices } = require('./vertices');
+const { processEdges } = require('./edges');
 const { parseYaml, validateSchema } = require('./helpers');
 
 chalk.level = 2;
@@ -104,12 +105,14 @@ async function graphOpen() {
 
         // process vertices
         const vertices = await processVertices(graphPath);
+        const edges = await processEdges(vertices);
 
         // set graph object
         oGraph.set({
             path: path.normalize(graphPath),
             language: researchFolderGraphYamlContentParsed.language || 'en',
-            vertices: vertices
+            vertices: vertices,
+            edges: edges
         });
 
         //console.log(chalk.magenta(JSON.stringify(oGraph.get(), null, 2)));
