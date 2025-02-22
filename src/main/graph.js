@@ -1,12 +1,12 @@
 const { BrowserWindow, dialog, ipcMain } = require('electron');
 const fs = require('fs').promises;
 const path = require('path');
-const yaml = require('yaml');
 const chalk = require('chalk');
 
 // internal imports
 const { SCHEMA_GRAPH_YAML } = require('./schemas');
 const { processVertices } = require('./vertices');
+const { parseYaml } = require('./helpers');
 
 chalk.level = 2;
 
@@ -165,17 +165,7 @@ async function validateSchema(schema, data) {
 }
 
 // parsers
-async function parseYaml(yamlContent) {
-    try {
-        const parsed = yaml.parse(yamlContent);
-        if (!parsed || typeof parsed !== 'object') {
-            return null;
-        }
-        return parsed;
-    } catch (error) {
-        return null;
-    }
-}
+
 
 // getters & setters
 function getGraph() {
