@@ -5,7 +5,7 @@ const { version } = require('./package.json');
 module.exports = {
   packagerConfig: {
     asar: true,
-    icon: 'public/images/icon'
+    icon: 'public/images/icon.ico'
   },
   rebuildConfig: {},
   makers: [
@@ -15,6 +15,7 @@ module.exports = {
         name: 'jedrasiak-research-desktop',
         setupExe: `jedrasiak-research-desktop-${version}.exe`,
         setupIcon: 'public/images/icon.ico',
+        iconUrl: 'https://www.jedrasiak.eu/images/research-desktop-icon.ico',
         noMsi: true
       },
     },
