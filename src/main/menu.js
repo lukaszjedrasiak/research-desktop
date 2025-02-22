@@ -1,6 +1,9 @@
 const { Menu } = require('electron');
 const { updateElectronApp } = require('update-electron-app');
 
+// internal imports
+const { graphOpen, graphRead, getCurrentGraphPath, getCurrentGraphItems } = require('./graph');
+
 function createMenu() {
     const defaultMenu = Menu.getApplicationMenu();
     const defaultMenuTemplate = defaultMenu.items.map(item => item);
@@ -9,6 +12,13 @@ function createMenu() {
         label: 'Application',
         submenu: [
             {label: 'Update', click: () => appUpdate()}
+        ]
+    });
+
+    defaultMenuTemplate.unshift({
+        label: 'Graph',
+        submenu: [
+            { label: 'Open', click: graphOpen }
         ]
     });
 
