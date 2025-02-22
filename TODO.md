@@ -1,4 +1,4 @@
-[ ] change app name
-[ ] change app icon
-[ ] add custom main menu
-[ ] add manual update check in main menu
+[X] change app name
+[X] change app icon
+[X] add custom main menu
+[X] add manual update check in main menu
