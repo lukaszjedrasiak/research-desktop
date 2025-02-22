@@ -1,4 +1,4 @@
-const { BrowserWindow, dialog } = require('electron');
+const { BrowserWindow, dialog, ipcMain } = require('electron');
 const fs = require('fs').promises;
 const path = require('path');
 const yaml = require('yaml');
@@ -34,6 +34,11 @@ const oGraph = {
         return this.data;
     }
 };
+
+// IPC
+ipcMain.handle('get-graph-data', () => {
+    return oGraph.get();
+});
 
 // main function
 async function graphOpen() {
