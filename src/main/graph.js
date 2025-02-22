@@ -6,10 +6,9 @@ const chalk = require('chalk');
 
 // internal imports
 const { SCHEMA_GRAPH_YAML } = require('./schemas');
+const { processVertices } = require('./vertices');
 
 chalk.level = 2;
-let currentGraphPath = null;
-let currentGraphItems = null;
 
 // global graph object definition
 const oGraph = {
@@ -42,22 +41,12 @@ ipcMain.handle('get-graph-data', () => {
 
 // main function
 async function graphOpen() {
-    oGraph.clear();
-    currentGraphItems = null;
-    
-    const graphPath = await graphSelect();
     console.log(chalk.blue(`# graphOpen()`))
-    console.log(`path: ${graphPath}`);
-    console.log(`currentGraphPath: ${currentGraphPath}`);
 
-    if (!graphPath) {
-        currentGraphPath = null;
-        return null;
-    }
-    
-    // process the graph
+    oGraph.clear();
+    const graphPath = await graphSelect();
+    if (!graphPath) return null;
     const graphItems = await graphRead(graphPath);
-    console.log(`graphItems: ${graphItems}`);
 
     try {
         if (!graphItems.includes('.research')) {
@@ -69,7 +58,7 @@ async function graphOpen() {
             return;
         }
 
-        if (!(await isFolder('.research'))) {
+        if (!(await isFolder(graphPath, '.research'))) {
             dialog.showMessageBox({
                 title: 'Warning',
                 message: 'The .research item is not a folder.',
@@ -78,7 +67,7 @@ async function graphOpen() {
             return;
         }
 
-        const researchFolder = path.join(currentGraphPath, '.research');
+        const researchFolder = path.join(graphPath, '.research');
         const researchFolderItems = await fs.readdir(researchFolder);
 
         if (!researchFolderItems.includes('graph.yaml')) {
@@ -113,13 +102,17 @@ async function graphOpen() {
             return;
         }
 
+        // process vertices
+        const vertices = await processVertices(graphPath);
+
         // set graph object
         oGraph.set({
-            path: path.normalize(currentGraphPath),
-            language: researchFolderGraphYamlContentParsed.language || 'en'
+            path: path.normalize(graphPath),
+            language: researchFolderGraphYamlContentParsed.language || 'en',
+            vertices: vertices
         });
 
-        console.log(chalk.magenta(JSON.stringify(oGraph.get(), null, 2)));
+        //console.log(chalk.magenta(JSON.stringify(oGraph.get(), null, 2)));
         const mainWindow = BrowserWindow.getFocusedWindow();
         mainWindow.loadFile('src/pages/preview/index.html');
 
@@ -137,38 +130,28 @@ async function graphOpen() {
 
 // helpers
 async function graphSelect() {
-    try {
-        const result = await dialog.showOpenDialog({
-            properties: ['openDirectory'],
-            title: 'Select a Folder',
-            buttonLabel: 'Choose Folder'
-        });
-        
-        if (!result.canceled) {
-            currentGraphPath = result.filePaths[0];
-            return currentGraphPath;
-        }
-
-        return null;
-    } catch (error) {
-        console.error('Error selecting folder:', error);
-        throw error;
+    const result = await dialog.showOpenDialog({
+        properties: ['openDirectory'],
+        title: 'Select a Folder',
+        buttonLabel: 'Choose Folder'
+    });
+    
+    if (!result.canceled) {
+        const path = result.filePaths[0];
+        return path;
     }
+
+    return null;
 }
 
 async function graphRead(path) {
-    try {
-        currentGraphItems = await fs.readdir(path);
-        return currentGraphItems;
-    } catch (error) {
-        console.error('Error reading folder:', error);
-        throw error;
-    }
+    const items = await fs.readdir(path);
+    return items;
 }
 
 // validators
-async function isFolder(item) {
-    const itemPath = path.join(currentGraphPath, item);
+async function isFolder(folderPath, item) {
+    const itemPath = path.join(folderPath, item);
     const itemStats = await fs.stat(itemPath);
     return itemStats.isDirectory();
 }
@@ -194,20 +177,11 @@ async function parseYaml(yamlContent) {
     }
 }
 
-// getters
-function getCurrentGraphPath() {
-    return currentGraphPath;
-}
-
-function getCurrentGraphItems() {
-    return currentGraphItems;
-}
-
+// getters & setters
 function getGraph() {
     return oGraph.get();
 }
 
-// setters
 function updateGraph(updates) {
     return oGraph.update(updates);
 }
@@ -218,8 +192,6 @@ function clearGraph() {
 
 module.exports = { 
     graphOpen, 
-    getCurrentGraphPath, 
-    getCurrentGraphItems,
     getGraph,
     updateGraph,
     clearGraph 
