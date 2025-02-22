@@ -2,12 +2,13 @@ const { app, ipcMain, BrowserWindow } = require('electron');
 const { updateElectronApp } = require('update-electron-app');
 const path = require('path');
 
+app.setAppUserModelId('com.squirrel.jedrasiak-research-desktop.JedrasiakResearchDesktop');
 updateElectronApp();
 
 // prevent duplicate launches when installing
 if (require("electron-squirrel-startup")) {
     app.quit();
-  }
+}
 
 const createWindow = () => {
     const win = new BrowserWindow({
@@ -16,7 +17,8 @@ const createWindow = () => {
             preload: path.join(__dirname, 'preload.js'),
             contextIsolation: true,
             nodeIntegration: false
-        }
+        },
+        icon: path.join(__dirname, '../public/images/icon.ico')
     })
 
     win.maximize();

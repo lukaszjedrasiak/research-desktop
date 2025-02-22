@@ -1,19 +1,20 @@
 const { FusesPlugin } = require('@electron-forge/plugin-fuses');
 const { FuseV1Options, FuseVersion } = require('@electron/fuses');
+const { version } = require('./package.json');
 
 module.exports = {
   packagerConfig: {
     asar: true,
+    icon: 'public/images/icon'
   },
   rebuildConfig: {},
   makers: [
     {
       name: '@electron-forge/maker-squirrel',
       config: {
-        name: 'research-desktop',
-        setupExe: 'research-desktop.exe',
-        setupIcon: 'public/icon.ico',
-        shortcutName: 'Research Desktop',
+        name: 'jedrasiak-research-desktop',
+        setupExe: `jedrasiak-research-desktop-${version}.exe`,
+        setupIcon: 'public/images/icon.ico',
         noMsi: true
       },
     },
@@ -23,7 +24,11 @@ module.exports = {
     },
     {
       name: '@electron-forge/maker-deb',
-      config: {},
+      config: {
+        options: {
+          icon: 'public/images/icon.png'
+        }
+      },
     },
     {
       name: '@electron-forge/maker-rpm',
@@ -55,7 +60,7 @@ module.exports = {
           owner: 'lukaszjedrasiak',
           name: 'research-desktop'
         },
-        prerelease: true,
+        prerelease: false,
         draft: true
       }
     }
