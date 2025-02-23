@@ -3,6 +3,7 @@ const chalk = require('chalk');
 chalk.level = 2;
 
 async function processEdges(vertices) {
+    console.log(chalk.blue('# processEdges()'));
     const edges = [];
     
     for (const vertex of vertices) {
