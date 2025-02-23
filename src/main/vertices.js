@@ -8,25 +8,13 @@ const { SCHEMA_VERTEX_YAML_COMPOUND, SCHEMA_VERTEX_YAML_INDEX } = require('./sch
 
 chalk.level = 2;
 
-const IGNORE_ITEMS = [
-    '.git',
-    '.gitignore',
-    '.research',
-    'CONTRIBUTING.md',
-    'LICENSE.md',
-    'README.md',
-]
-
-async function processVertices(graphPath) {
+async function processVertices(graphPath, graphItems) {
     console.log(chalk.blue('# processVertices()'));
     const vertices = [];
 
-    const graphItemsAll = await fs.readdir(graphPath);
-    const graphItemsNotIgnored = graphItemsAll.filter(item => !IGNORE_ITEMS.includes(item));
-
     // get only the folders
     let graphItemsFolders = [];
-    for (const item of graphItemsNotIgnored) {
+    for (const item of graphItems) {
         const itemPath = path.join(graphPath, item);
         const itemStats = await fs.stat(itemPath);
         if (itemStats.isDirectory()) {

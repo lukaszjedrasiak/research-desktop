@@ -35,6 +35,15 @@ const oGraph = {
     }
 };
 
+const IGNORE_ITEMS = [
+    '.git',
+    '.gitignore',
+    '.research',
+    'CONTRIBUTING.md',
+    'LICENSE.md',
+    'README.md',
+]
+
 // IPC
 ipcMain.handle('get-graph-data', () => {
     return oGraph.get();
@@ -47,7 +56,9 @@ async function graphOpen() {
     oGraph.clear();
     const graphPath = await graphSelect();
     if (!graphPath) return null;
+
     const graphItems = await graphRead(graphPath);
+    const graphItemsNotIgnored = graphItems.filter(item => !IGNORE_ITEMS.includes(item));
 
     try {
         if (!graphItems.includes('.research')) {
@@ -104,7 +115,7 @@ async function graphOpen() {
         }
 
         // process vertices
-        const vertices = await processVertices(graphPath);
+        const vertices = await processVertices(graphPath, graphItemsNotIgnored);
         const edges = await processEdges(vertices);
 
         // set graph object
