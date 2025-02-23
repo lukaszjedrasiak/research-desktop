@@ -18,13 +18,11 @@ const IGNORE_ITEMS = [
 ]
 
 async function processVertices(graphPath) {
+    console.log(chalk.blue('# processVertices()'));
     const vertices = [];
 
-    //console.log(chalk.blue('# processVertices()'));
     const graphItemsAll = await fs.readdir(graphPath);
-    //console.log(chalk.green(`graphItemsAll: ${graphItemsAll}`));
     const graphItemsNotIgnored = graphItemsAll.filter(item => !IGNORE_ITEMS.includes(item));
-    //console.log(chalk.green(`graphItemsNotIgnored: ${graphItemsNotIgnored}`));
 
     // get only the folders
     let graphItemsFolders = [];
@@ -35,7 +33,6 @@ async function processVertices(graphPath) {
             graphItemsFolders.push(item);
         }
     }
-    console.log(chalk.green(`graphItemsFolders: ${graphItemsFolders}`));
 
     for (const vertexFolderName of graphItemsFolders) {
         //console.log(chalk.blue(`# vertexFolderName: ${vertexFolderName}`));
