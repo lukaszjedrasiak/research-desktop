@@ -57,11 +57,12 @@ async function graphOpen() {
     const graphPath = await graphSelect();
     if (!graphPath) return null;
 
-    const graphItems = await graphRead(graphPath);
-    const graphItemsNotIgnored = graphItems.filter(item => !IGNORE_ITEMS.includes(item));
+    const graphItemsAll = await graphRead(graphPath);
+    const graphItemsNotIgnored = graphItemsAll.filter(item => !IGNORE_ITEMS.includes(item));
+    const graphItemsClassified = [];
 
     try {
-        if (!graphItems.includes('.research')) {
+        if (!graphItemsAll.includes('.research')) {
             dialog.showMessageBox({
                 title: 'Warning',
                 message: 'The .research item is missing.',
@@ -114,6 +115,26 @@ async function graphOpen() {
             return;
         }
 
+        // proces items
+        for (const item of graphItemsNotIgnored) {
+            const itemPath = path.join(graphPath, item);
+            const itemStats = await fs.stat(itemPath);
+
+            if (itemStats.isDirectory()) {
+                graphItemsClassified.push({
+                    name: item,
+                    type: 'folder',
+                    path: itemPath,
+                });
+            } else if (itemStats.isFile()) {
+                graphItemsClassified.push({
+                    name: item,
+                    type: 'file',
+                    path: itemPath,
+                });
+            }
+        }
+
         // process vertices
         const vertices = await processVertices(graphPath, graphItemsNotIgnored);
         const edges = await processEdges(vertices);
@@ -123,7 +144,8 @@ async function graphOpen() {
             path: path.normalize(graphPath),
             language: researchFolderGraphYamlContentParsed.language || 'en',
             vertices: vertices,
-            edges: edges
+            edges: edges,
+            items: graphItemsClassified
         });
 
         //console.log(chalk.magenta(JSON.stringify(oGraph.get(), null, 2)));
