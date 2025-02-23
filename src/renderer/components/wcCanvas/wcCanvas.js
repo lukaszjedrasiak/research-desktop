@@ -166,11 +166,14 @@ export default class wcCanvas extends HTMLElement {
 
         vertices.forEach(vertex => {
             let title = vertex.title[this.currentLanguage];
+
             if (!vertex.canvas.selected) {
                 title = title.length > 16 ? title.slice(0, 16).trim() + '…' : title;
+                this.ctx.fillStyle = this.computedStyle.getPropertyValue('--muted');
+            } else {
+                this.ctx.fillStyle = this.computedStyle.getPropertyValue('--font');
             }
             const fontSize = 14;
-            this.ctx.fillStyle = this.computedStyle.getPropertyValue('--placeholder');
             this.ctx.font = `${fontSize}px monospace`;
 
             const textWidth = Math.floor(this.ctx.measureText(title).width);
