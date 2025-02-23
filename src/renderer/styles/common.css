@@ -1,5 +1,7 @@
 @import './colors.css';
 @import './typography.css';
+@import './layout.css';
+@import './icons.css';
 
 @import './header.css';
 @import './main.css';
@@ -31,7 +33,6 @@ body {
     margin: 0;
     padding: 0;
 
-    outline: 1px solid red;
     display: flex;
     flex-direction: column;
     height: 100vh;
