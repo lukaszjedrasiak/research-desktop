@@ -2,7 +2,7 @@ const { Menu } = require('electron');
 const { updateElectronApp } = require('update-electron-app');
 
 // internal imports
-const { graphOpen, graphRead, getCurrentGraphPath, getCurrentGraphItems } = require('./graph');
+const { graphOpen, graphReload } = require('./graph');
 
 function createMenu() {
     const defaultMenu = Menu.getApplicationMenu();
@@ -18,7 +18,8 @@ function createMenu() {
     defaultMenuTemplate.unshift({
         label: 'Graph',
         submenu: [
-            { label: 'Open', click: graphOpen }
+            { label: 'Open', accelerator: 'CmdOrCtrl+Shift+O', click: graphOpen },
+            { label: 'Reload', accelerator: 'CmdOrCtrl+F5', click: graphReload }
         ]
     });
 
