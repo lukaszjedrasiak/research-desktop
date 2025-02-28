@@ -2,11 +2,11 @@ const { Menu } = require('electron');
 const { updateElectronApp } = require('update-electron-app');
 
 // internal imports
-const { graphOpen, graphRead, getCurrentGraphPath, getCurrentGraphItems } = require('./graph');
+const { graphOpen, graphReload, graphClose } = require('./graph');
 
 function createMenu() {
     const defaultMenu = Menu.getApplicationMenu();
-    const defaultMenuTemplate = defaultMenu.items.map(item => item);
+    const defaultMenuTemplate = defaultMenu.items.filter(item => item.label !== 'File' && item.label !== 'Window');
 
     defaultMenuTemplate.push({
         label: 'Application',
@@ -18,7 +18,9 @@ function createMenu() {
     defaultMenuTemplate.unshift({
         label: 'Graph',
         submenu: [
-            { label: 'Open', click: graphOpen }
+            { label: 'Open (preview)', accelerator: 'CmdOrCtrl+Shift+O', click: graphOpen },
+            { label: 'Reload', accelerator: 'CmdOrCtrl+F5', click: graphReload },
+            { label: 'Close', accelerator: 'CmdOrCtrl+W', click: graphClose }
         ]
     });
 
