@@ -105,6 +105,8 @@ export default class wcCanvas extends HTMLElement {
         this.ctx.stroke();
         
         // Draw grid dots
+        if (this.scale < 0.5) return;
+
         this.ctx.fillStyle = this.computedStyle.getPropertyValue('--border');
         
         for (let x = startX; x <= endX; x += gridSpacing) {
@@ -296,6 +298,7 @@ export default class wcCanvas extends HTMLElement {
         this.offset.y = this.offset.y;
 
         this.drawGraph();
+        //console.log(`%c scale: ${this.scale}`, 'color: lightblue');
     }
 
     mouseDown(event) {
