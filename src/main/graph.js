@@ -53,6 +53,10 @@ ipcMain.handle('graph-reload', () => {
     return graphReload();
 });
 
+ipcMain.handle('close-graph', () => {
+    return graphClose();
+});
+
 // main function
 async function graphOpen() {
     console.log(chalk.blue(`# graphOpen()`))
@@ -299,6 +303,33 @@ async function graphReload() {
     }
 }
 
+async function graphClose() {
+    console.log(chalk.blue(`# graphClose()`));
+    
+    // Get the current graph data to check if there's anything loaded
+    const currentGraph = oGraph.get();
+    
+    // Check if there's any graph loaded
+    if (!currentGraph) {
+        dialog.showMessageBox({
+            title: 'Warning',
+            message: 'No graph is currently loaded to close.',
+            type: 'warning'
+        });
+        return null;
+    }
+    
+    // Clean the graph object
+    clearGraph();
+    
+    // Navigate to dashboard
+    const mainWindow = BrowserWindow.getFocusedWindow();
+    mainWindow.loadFile('src/pages/dashboard/index.html');
+    
+    console.log(chalk.green(`# graphClose() | Graph closed successfully`));
+    return true;
+}
+
 // helpers
 async function graphSelect() {
     const result = await dialog.showOpenDialog({
@@ -343,6 +374,7 @@ function clearGraph() {
 module.exports = { 
     graphOpen, 
     graphReload,
+    graphClose,
     getGraph,
     updateGraph,
     clearGraph 
