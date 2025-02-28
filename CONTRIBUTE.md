@@ -14,5 +14,6 @@
 ## scopes
 
 * main: main process
+* preview: preview frontendprocess
 * pageName: frontend process
 * renderer: renderer process
