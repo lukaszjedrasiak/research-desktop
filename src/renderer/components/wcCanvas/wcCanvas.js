@@ -78,7 +78,23 @@ export default class wcCanvas extends HTMLElement {
     }
 
     async drawGrid() {
-
+        // Get the visible area in the original coordinate system (before transform)
+        const gridSpacing = 100; // Distance between grid dots
+        const dotRadius = 0.5; // Size of each dot
+        
+        // Calculate the visible area boundaries in the original coordinate system
+        const visibleLeft = (-this.offset.x) / this.scale;
+        const visibleRight = (this.canvasElement.width - this.offset.x) / this.scale;
+        const visibleTop = (-this.offset.y) / this.scale;
+        const visibleBottom = (this.canvasElement.height - this.offset.y) / this.scale;
+        
+        // Calculate grid start/end points based on visible area
+        const startX = Math.floor(visibleLeft / gridSpacing) * gridSpacing;
+        const endX = Math.ceil(visibleRight / gridSpacing) * gridSpacing;
+        const startY = Math.floor(visibleTop / gridSpacing) * gridSpacing;
+        const endY = Math.ceil(visibleBottom / gridSpacing) * gridSpacing;
+        
+        // Draw origin crosshair
         this.ctx.beginPath();
         this.ctx.moveTo(-16, 0);
         this.ctx.lineTo(16, 0);
@@ -87,6 +103,22 @@ export default class wcCanvas extends HTMLElement {
         this.ctx.lineWidth = 0.5;
         this.ctx.strokeStyle = this.computedStyle.getPropertyValue('--warning');
         this.ctx.stroke();
+        
+        // Draw grid dots
+        if (this.scale < 0.5) return;
+
+        this.ctx.fillStyle = this.computedStyle.getPropertyValue('--border');
+        
+        for (let x = startX; x <= endX; x += gridSpacing) {
+            for (let y = startY; y <= endY; y += gridSpacing) {
+                // Skip the origin as it already has the crosshair
+                if (x === 0 && y === 0) continue;
+                
+                this.ctx.beginPath();
+                this.ctx.arc(x, y, dotRadius, 0, 2 * Math.PI);
+                this.ctx.fill();
+            }
+        }
     }
 
     async drawVertices(vertices) {
@@ -266,6 +298,7 @@ export default class wcCanvas extends HTMLElement {
         this.offset.y = this.offset.y;
 
         this.drawGraph();
+        //console.log(`%c scale: ${this.scale}`, 'color: lightblue');
     }
 
     mouseDown(event) {
