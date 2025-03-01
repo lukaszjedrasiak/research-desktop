@@ -28,11 +28,13 @@ const createWindow = () => {
     win.show();
     win.loadFile('src/pages/dashboard/index.html');
 
-    // open dev tools
-    win.webContents.openDevTools({
-        mode: 'dock',
-        activate: true
-    });
+    // open dev tools only in development mode
+    if (!app.isPackaged) {
+        win.webContents.openDevTools({
+            mode: 'dock',
+            activate: true
+        });
+    }
 }
 
 app.whenReady().then(() => {
