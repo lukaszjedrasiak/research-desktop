@@ -42,7 +42,7 @@ const IGNORE_ITEMS = [
 ]
 
 // IPC
-ipcMain.handle('get-graph-data', () => {
+ipcMain.handle('graph-get', () => {
     return oGraph.get();
 });
 
@@ -50,7 +50,7 @@ ipcMain.handle('graph-reload', () => {
     return graphReload();
 });
 
-ipcMain.handle('close-graph', () => {
+ipcMain.handle('graph-close', () => {
     return graphClose();
 });
 
@@ -331,7 +331,7 @@ async function graphClose() {
     }
     
     // Clean the graph object
-    clearGraph();
+    graphClear();
     
     // Navigate to dashboard
     const mainWindow = BrowserWindow.getFocusedWindow();
@@ -370,15 +370,15 @@ async function isFolder(folderPath, item) {
 }
 
 // getters & setters
-function getGraph() {
+function graphGet() {
     return oGraph.get();
 }
 
-function updateGraph(updates) {
+function graphUpdate(updates) {
     return oGraph.update(updates);
 }
 
-function clearGraph() {
+function graphClear() {
     oGraph.clear();
 }
 
@@ -386,7 +386,7 @@ module.exports = {
     graphOpen, 
     graphReload,
     graphClose,
-    getGraph,
-    updateGraph,
-    clearGraph 
+    graphGet,
+    graphUpdate,
+    graphClear
 };

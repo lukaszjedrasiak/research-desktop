@@ -81,9 +81,9 @@ async function vertexCreate() {
     console.log(chalk.blue('# vertexCreate()'));
 
     // internal imports
-    const { getGraph, graphReload } = require('./graph');
+    const { graphGet, graphReload } = require('./graph');
 
-    const currentGraph = getGraph();
+    const currentGraph = graphGet();
 
     if (!currentGraph) {
         dialog.showMessageBox({
