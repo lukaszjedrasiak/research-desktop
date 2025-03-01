@@ -1,12 +1,19 @@
+const { dialog, ipcMain } = require('electron');
+
 const chalk = require('chalk');
 const fs = require('fs').promises;
 const path = require('path');
 
 // internal imports
-const { extractYaml, parseYaml, validateSchema } = require('./helpers');
+const { extractYaml, parseYaml, validateSchema, jsonToYaml } = require('./helpers');
 const { SCHEMA_VERTEX_YAML_COMPOUND, SCHEMA_VERTEX_YAML_INDEX } = require('./schemas');
 
 chalk.level = 2;
+
+// IPC
+ipcMain.handle('vertex-create', () => {
+    return vertexCreate();
+});
 
 async function processVertices(graphPath, graphItems) {
     console.log(chalk.blue('# processVertices()'));
@@ -70,4 +77,86 @@ async function processVertices(graphPath, graphItems) {
     return vertices;
 }
 
-module.exports = { processVertices };
+async function vertexCreate() {
+    console.log(chalk.blue('# vertexCreate()'));
+
+    // internal imports
+    const { graphGet, graphReload } = require('./graph');
+
+    const currentGraph = graphGet();
+
+    if (!currentGraph) {
+        dialog.showMessageBox({
+            title: 'Error',
+            message: 'No graph is currently loaded',
+            type: 'error'
+        });
+        return;
+    }
+
+    // Use native save dialog to get vertex name and location
+    const result = await dialog.showSaveDialog({
+        title: 'Create New Vertex',
+        buttonLabel: 'Create Vertex',
+        properties: ['createDirectory'],
+        defaultPath: currentGraph.path
+    });
+
+    if (!result.canceled && result.filePath) {
+        const vertexName = path.basename(result.filePath);
+        console.log(chalk.green(`vertexCreate() | name: ${vertexName} | path: ${result.filePath}`));
+
+        // create folder
+        const vertexFolderPath = path.join(currentGraph.path, vertexName);
+        await fs.mkdir(vertexFolderPath, { recursive: true });
+
+        // create graph.yaml
+        const graphYamlObject = {
+            uuid: crypto.randomUUID(),
+            type: 'permanent',
+            visibility: 'private',
+            created: new Date().toISOString(),
+            modified: new Date().toISOString(),
+            canvas: {
+                x: 0,
+                y: 0,
+                library: 'material-symbols-rounded',
+                icon: 'article',
+                size: 16,
+                fill: '--primary',
+                stroke: null
+            },
+            edges: {
+                'parent': [],
+                'sibling': []
+            }
+        }
+
+        const graphYamlString = await jsonToYaml(graphYamlObject);
+
+        const graphYamlPath = path.join(vertexFolderPath, 'graph.yaml');
+        await fs.writeFile(graphYamlPath, graphYamlString);
+
+        // create index files
+        for (const singleLanguage of currentGraph.languages.all) {
+            const indexYamlObject = {
+                title: vertexName,
+                slug: vertexName
+            }
+
+            const indexYamlString = await jsonToYaml(indexYamlObject);
+            const indexYamlStringFinal = `---\n${indexYamlString}---\n\n...`;
+            const indexFilePath = path.join(vertexFolderPath, `index.${singleLanguage}.md`);
+            await fs.writeFile(indexFilePath, indexYamlStringFinal);
+        }
+
+        graphReload();
+    }
+    
+    return null;
+}
+
+module.exports = {
+    processVertices,
+    vertexCreate
+};

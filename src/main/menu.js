@@ -3,6 +3,7 @@ const { updateElectronApp } = require('update-electron-app');
 
 // internal imports
 const { graphOpen, graphReload, graphClose } = require('./graph');
+const { vertexCreate } = require('./vertices');
 
 function createMenu() {
     const defaultMenu = Menu.getApplicationMenu();
@@ -12,6 +13,13 @@ function createMenu() {
         label: 'Application',
         submenu: [
             {label: 'Update', click: () => appUpdate()}
+        ]
+    });
+
+    defaultMenuTemplate.unshift({
+        label: 'Vertex',
+        submenu: [
+            { label: 'New', accelerator: 'CmdOrCtrl+N', click: vertexCreate}
         ]
     });
 

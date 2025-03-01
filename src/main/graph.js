@@ -4,10 +4,7 @@ const path = require('path');
 const chalk = require('chalk');
 
 // internal imports
-const { SCHEMA_GRAPH_YAML } = require('./schemas');
-const { processVertices } = require('./vertices');
-const { processEdges } = require('./edges');
-const { parseYaml, validateSchema } = require('./helpers');
+
 
 chalk.level = 2;
 
@@ -45,7 +42,7 @@ const IGNORE_ITEMS = [
 ]
 
 // IPC
-ipcMain.handle('get-graph-data', () => {
+ipcMain.handle('graph-get', () => {
     return oGraph.get();
 });
 
@@ -53,13 +50,19 @@ ipcMain.handle('graph-reload', () => {
     return graphReload();
 });
 
-ipcMain.handle('close-graph', () => {
+ipcMain.handle('graph-close', () => {
     return graphClose();
 });
 
 // main function
 async function graphOpen() {
     console.log(chalk.blue(`# graphOpen()`))
+
+    // internal imports
+    const { SCHEMA_GRAPH_YAML } = require('./schemas');
+    const { processVertices } = require('./vertices');
+    const { processEdges } = require('./edges');
+    const { parseYaml, validateSchema } = require('./helpers');
 
     oGraph.clear();
     const graphPath = await graphSelect();
@@ -150,7 +153,8 @@ async function graphOpen() {
         // set graph object
         oGraph.set({
             path: path.normalize(graphPath),
-            language: researchFolderGraphYamlContentParsed.language || 'en',
+            //language: researchFolderGraphYamlContentParsed.language || 'en',
+            languages: researchFolderGraphYamlContentParsed.languages,
             vertices: vertices,
             edges: edges,
             items: graphItemsClassified
@@ -175,6 +179,12 @@ async function graphOpen() {
 
 async function graphReload() {
     console.log(chalk.blue(`# graphReload()`));
+
+    // internal imports
+    const { SCHEMA_GRAPH_YAML } = require('./schemas');
+    const { processVertices } = require('./vertices');
+    const { processEdges } = require('./edges');
+    const { parseYaml, validateSchema } = require('./helpers');
     
     // Get the current graph data
     const currentGraph = oGraph.get();
@@ -280,7 +290,8 @@ async function graphReload() {
         // set graph object
         oGraph.set({
             path: path.normalize(graphPath),
-            language: researchFolderGraphYamlContentParsed.language || 'en',
+            //language: researchFolderGraphYamlContentParsed.language || 'en',
+            languages: researchFolderGraphYamlContentParsed.languages,
             vertices: vertices,
             edges: edges,
             items: graphItemsClassified
@@ -320,7 +331,7 @@ async function graphClose() {
     }
     
     // Clean the graph object
-    clearGraph();
+    graphClear();
     
     // Navigate to dashboard
     const mainWindow = BrowserWindow.getFocusedWindow();
@@ -359,15 +370,15 @@ async function isFolder(folderPath, item) {
 }
 
 // getters & setters
-function getGraph() {
+function graphGet() {
     return oGraph.get();
 }
 
-function updateGraph(updates) {
+function graphUpdate(updates) {
     return oGraph.update(updates);
 }
 
-function clearGraph() {
+function graphClear() {
     oGraph.clear();
 }
 
@@ -375,7 +386,7 @@ module.exports = {
     graphOpen, 
     graphReload,
     graphClose,
-    getGraph,
-    updateGraph,
-    clearGraph 
+    graphGet,
+    graphUpdate,
+    graphClear
 };

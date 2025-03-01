@@ -6,7 +6,6 @@ export default class wcCanvas extends HTMLElement {
         this.computedStyle = getComputedStyle(document.documentElement);
         this.vertices = [];
         this.edges = [];
-        this.currentLanguage = 'en';
 
         this.resizeTimer = null;
         this.resizeDelay = 100;
@@ -72,6 +71,7 @@ export default class wcCanvas extends HTMLElement {
             const graphData = await window.api_internal.getGraphData();
             this.vertices = graphData.vertices;
             this.edges = graphData.edges;
+            this.currentLanguage = graphData.languages.default;
         } catch(error) {
             console.error('Error fetching graph data:', error);
         }

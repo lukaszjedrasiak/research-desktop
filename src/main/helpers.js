@@ -18,6 +18,10 @@ async function parseYaml(yamlContent) {
     }
 }
 
+async function jsonToYaml(jsonObject) {
+    return yaml.stringify(jsonObject, { indent: 4 });
+}
+
 async function validateSchema(schema, data) {
     const result = schema.safeParse(data);
     if (!result.success) {
@@ -29,5 +33,6 @@ async function validateSchema(schema, data) {
 module.exports = {
     extractYaml,
     parseYaml,
-    validateSchema
+    validateSchema,
+    jsonToYaml
 };
