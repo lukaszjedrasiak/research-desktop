@@ -7,17 +7,17 @@ async function processEdges(vertices) {
     const edges = [];
     
     for (const vertex of vertices) {
-        if (!vertex.edges) continue;
+        if (!vertex._edges) continue;
 
-        for (const label of Object.keys(vertex.edges)) {
-            if (!vertex.edges[label]?.length) continue;
+        for (const label of Object.keys(vertex._edges)) {
+            if (!vertex._edges[label]?.length) continue;
 
-            for (const edge of vertex.edges[label]) {
+            for (const edge of vertex._edges[label]) {
                 edges.push({
-                    from: vertex.uuid,
-                    to: edge,
-                    label: label,
-                    canvas: {
+                    _from: vertex._uuid,
+                    _to: edge,
+                    _label: label,
+                    _canvas: {
                         color: '--layer',
                         width: 1,
                         weight: 1
