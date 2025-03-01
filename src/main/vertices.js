@@ -1,3 +1,5 @@
+const { dialog, ipcMain } = require('electron');
+
 const chalk = require('chalk');
 const fs = require('fs').promises;
 const path = require('path');
@@ -7,6 +9,11 @@ const { extractYaml, parseYaml, validateSchema } = require('./helpers');
 const { SCHEMA_VERTEX_YAML_COMPOUND, SCHEMA_VERTEX_YAML_INDEX } = require('./schemas');
 
 chalk.level = 2;
+
+// IPC
+ipcMain.handle('vertex-create', () => {
+    return vertexCreate();
+});
 
 async function processVertices(graphPath, graphItems) {
     console.log(chalk.blue('# processVertices()'));
@@ -70,4 +77,29 @@ async function processVertices(graphPath, graphItems) {
     return vertices;
 }
 
-module.exports = { processVertices };
+async function vertexCreate() {
+    console.log(chalk.blue('# vertexCreate()'));
+
+    // internal imports
+    const { getGraph } = require('./graph');
+
+    if (!getGraph()) {
+        dialog.showMessageBox({
+            title: 'Error',
+            message: 'No graph is currently loaded',
+            type: 'error'
+        });
+        return;
+    }
+
+    dialog.showMessageBox({
+        title: 'Create Vertex',
+        message: 'Enter the name of the vertex',
+        type: 'info'
+    });
+}
+
+module.exports = {
+    processVertices,
+    vertexCreate
+};
