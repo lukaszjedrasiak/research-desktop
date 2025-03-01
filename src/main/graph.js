@@ -4,10 +4,7 @@ const path = require('path');
 const chalk = require('chalk');
 
 // internal imports
-const { SCHEMA_GRAPH_YAML } = require('./schemas');
-const { processVertices } = require('./vertices');
-const { processEdges } = require('./edges');
-const { parseYaml, validateSchema } = require('./helpers');
+
 
 chalk.level = 2;
 
@@ -60,6 +57,12 @@ ipcMain.handle('close-graph', () => {
 // main function
 async function graphOpen() {
     console.log(chalk.blue(`# graphOpen()`))
+
+    // internal imports
+    const { SCHEMA_GRAPH_YAML } = require('./schemas');
+    const { processVertices } = require('./vertices');
+    const { processEdges } = require('./edges');
+    const { parseYaml, validateSchema } = require('./helpers');
 
     oGraph.clear();
     const graphPath = await graphSelect();
@@ -176,6 +179,12 @@ async function graphOpen() {
 
 async function graphReload() {
     console.log(chalk.blue(`# graphReload()`));
+
+    // internal imports
+    const { SCHEMA_GRAPH_YAML } = require('./schemas');
+    const { processVertices } = require('./vertices');
+    const { processEdges } = require('./edges');
+    const { parseYaml, validateSchema } = require('./helpers');
     
     // Get the current graph data
     const currentGraph = oGraph.get();
