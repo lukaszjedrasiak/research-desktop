@@ -150,7 +150,8 @@ async function graphOpen() {
         // set graph object
         oGraph.set({
             path: path.normalize(graphPath),
-            language: researchFolderGraphYamlContentParsed.language || 'en',
+            //language: researchFolderGraphYamlContentParsed.language || 'en',
+            languages: researchFolderGraphYamlContentParsed.languages,
             vertices: vertices,
             edges: edges,
             items: graphItemsClassified
@@ -280,7 +281,8 @@ async function graphReload() {
         // set graph object
         oGraph.set({
             path: path.normalize(graphPath),
-            language: researchFolderGraphYamlContentParsed.language || 'en',
+            //language: researchFolderGraphYamlContentParsed.language || 'en',
+            languages: researchFolderGraphYamlContentParsed.languages,
             vertices: vertices,
             edges: edges,
             items: graphItemsClassified
