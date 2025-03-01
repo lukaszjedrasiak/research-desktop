@@ -1,7 +1,7 @@
 {
   "name": "jedrasiak-research-desktop",
   "productName": "Jedrasiak Research Desktop",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "main": "src/main/main.js",
   "scripts": {
     "start": "electron-forge start",
