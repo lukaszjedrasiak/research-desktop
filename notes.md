@@ -45,3 +45,16 @@
 │── webpack.config.js   # Webpack config (if using Webpack)
 │── .gitignore          # Git ignore file
 │── README.md           # Documentation
+
+# how to measure performance
+
+```
+const startTime = performance.now();
+// loop here
+const endTime = performance.now();
+const elapsedTime = endTime - startTime;
+console.log(`Vertex selection timing:`);
+console.log(`- Start time: ${startTime.toFixed(2)} ms`);
+console.log(`- End time: ${endTime.toFixed(2)} ms`);
+console.log(`- Elapsed time: ${elapsedTime.toFixed(2)} ms`);
+```

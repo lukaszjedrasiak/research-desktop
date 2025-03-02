@@ -220,7 +220,7 @@ export default class wcCanvas extends HTMLElement {
         this.ctx.save();
         this.ctx.translate(this.offset.x, this.offset.y);
         this.ctx.scale(this.scale, this.scale);
-        //this.drawGrid();
+        this.drawGrid();
         this.drawEdges(this.edges);
         this.drawVertices(this.vertices);
         this.drawLabels(this.vertices);
@@ -306,26 +306,24 @@ export default class wcCanvas extends HTMLElement {
             // left mouse button
             case 0:
                 const {originalX, originalY} = this.getCartesianCoordinates(event);
-        
+
                 for (const vertex of this.vertices) {
                     const dx = originalX - vertex._canvas.x;
                     const dy = originalY - vertex._canvas.y;
         
                     if (dx * dx + dy * dy < vertex._canvas.size * vertex._canvas.size) {
-
                         if (!vertex._canvas.selected) {
                             this.vertices.forEach(v => v._canvas.selected = false);
                             vertex._canvas.selected = true;
                         }
-                        
-                        this.drawGraph();
                         break;
                     } else {
                         this.vertices.forEach(v => v._canvas.selected = false);
-                        this.drawGraph();
                     }
                 }
 
+                // redraw canvas after the loop
+                this.drawGraph();
                 break;
 
             // middle mouse button
