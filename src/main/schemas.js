@@ -40,12 +40,12 @@ const SCHEMA_VERTEX_YAML_COMPOUND = z.object({
         z.string(), // any string key for link type
         z.array(z.string().uuid())
     ).optional()
-})
+}).passthrough()
 
 const SCHEMA_VERTEX_YAML_INDEX = z.object({
     _title: z.string(),
     _slug: z.string()
-})
+}).passthrough()
 
 module.exports = {
     SCHEMA_GRAPH_YAML,

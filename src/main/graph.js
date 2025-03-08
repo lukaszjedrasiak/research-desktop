@@ -97,7 +97,7 @@ async function graphOpen() {
         if (!researchFolderItems.includes('graph.yaml')) {
             dialog.showMessageBox({
                 title: 'Warning',
-                message: 'The graph.yaml file is missing.',
+                message: 'The .research/graph.yaml file is missing.',
                 type: 'warning'
             });
             return;
@@ -110,7 +110,7 @@ async function graphOpen() {
         if (!researchFolderGraphYamlContentParsed) {
             dialog.showMessageBox({
                 title: 'Warning',
-                message: 'The graph.yaml file is not a valid YAML object.',
+                message: 'The .research/graph.yaml file is not a valid YAML object.',
                 type: 'warning'
             });
             return;
@@ -120,7 +120,7 @@ async function graphOpen() {
         if (!(await validateSchema(SCHEMA_GRAPH_YAML, researchFolderGraphYamlContentParsed))) {
             dialog.showMessageBox({
                 title: 'Warning',
-                message: 'The graph.yaml file does not match the required schema.',
+                message: 'The .research/graph.yaml file does not match the required schema.',
                 type: 'warning'
             });
             return;
@@ -257,7 +257,7 @@ async function graphReload() {
         if (!(await validateSchema(SCHEMA_GRAPH_YAML, researchFolderGraphYamlContentParsed))) {
             dialog.showMessageBox({
                 title: 'Warning',
-                message: 'The graph.yaml file does not match the required schema.',
+                message: 'The .research/graph.yaml file does not match the required schema.',
                 type: 'warning'
             });
             return;

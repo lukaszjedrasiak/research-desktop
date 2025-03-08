@@ -25,6 +25,7 @@ async function jsonToYaml(jsonObject) {
 async function validateSchema(schema, data) {
     const result = schema.safeParse(data);
     if (!result.success) {
+        console.log(result.error);
         return false;
     }
     return true;
