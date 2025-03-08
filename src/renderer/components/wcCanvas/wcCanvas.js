@@ -124,34 +124,34 @@ export default class wcCanvas extends HTMLElement {
     async drawVertices(vertices) {
 
         vertices.forEach(async vertex => {
-            await this.drawIcon(vertex.canvas, vertex.canvas.selected);
+            await this.drawIcon(vertex._canvas, vertex._canvas.selected);
         });
     }
 
     async drawEdges(edges) {
         edges.forEach(edge => {
-            const from = this.vertices.find(v => v.uuid === edge.from);
-            const to = this.vertices.find(v => v.uuid === edge.to);
+            const from = this.vertices.find(v => v._uuid === edge._from);
+            const to = this.vertices.find(v => v._uuid === edge._to);
 
-            let currentColor = this.computedStyle.getPropertyValue(edge.canvas.color);
+            let currentColor = this.computedStyle.getPropertyValue(edge._canvas.color);
                 
-            if (edge.label === 'parent' && from.canvas.selected) {
+            if (edge._label === 'parent' && from._canvas.selected) {
                 currentColor = this.computedStyle.getPropertyValue('--tertiary');
             }
 
-            if (edge.label === 'sibling' && (from.canvas.selected || to.canvas.selected)) {
+            if (edge._label === 'sibling' && (from._canvas.selected || to._canvas.selected)) {
                 currentColor = this.computedStyle.getPropertyValue('--tertiary');
             }
 
             this.ctx.beginPath();
-            this.ctx.moveTo(from.canvas.x, from.canvas.y);
-            this.ctx.lineTo(to.canvas.x, to.canvas.y);
+            this.ctx.moveTo(from._canvas.x, from._canvas.y);
+            this.ctx.lineTo(to._canvas.x, to._canvas.y);
             this.ctx.strokeStyle = currentColor;
-            this.ctx.lineWidth = edge.canvas.width;
+            this.ctx.lineWidth = edge._canvas.width;
             this.ctx.stroke();
             
-            if (edge.label === 'parent') {
-                this.drawArrows(from, to, currentColor, edge.canvas.width);
+            if (edge._label === 'parent') {
+                this.drawArrows(from, to, currentColor, edge._canvas.width);
             }
         });
     }
@@ -161,8 +161,8 @@ export default class wcCanvas extends HTMLElement {
         const angle = Math.PI / 6;
 
         // calculate direction from 'from' to 'to'
-        const dx = to.canvas.x - from.canvas.x;
-        const dy = to.canvas.y - from.canvas.y;
+        const dx = to._canvas.x - from._canvas.x;
+        const dy = to._canvas.y - from._canvas.y;
         const distance = Math.sqrt(dx * dx + dy * dy);
 
         // normalize the direction vector
@@ -170,8 +170,8 @@ export default class wcCanvas extends HTMLElement {
         const directionY = dy / distance;
 
         // calculate the end of the edge adjusted to be at the edge of the 'to' circle
-        const adjustedToX = to.canvas.x - directionX * (to.canvas.size * 1.125);
-        const adjustedToY = to.canvas.y - directionY * (to.canvas.size * 1.125);
+        const adjustedToX = to._canvas.x - directionX * (to._canvas.size * 1.125);
+        const adjustedToY = to._canvas.y - directionY * (to._canvas.size * 1.125);
 
         // calculate the position for the arrowhead
         const arrowX = adjustedToX;
@@ -197,9 +197,9 @@ export default class wcCanvas extends HTMLElement {
     async drawLabels(vertices) {
 
         vertices.forEach(vertex => {
-            let title = vertex.title[this.currentLanguage];
+            let title = vertex._title[this.currentLanguage];
 
-            if (!vertex.canvas.selected) {
+            if (!vertex._canvas.selected) {
                 title = title.length > 16 ? title.slice(0, 16).trim() + '…' : title;
                 this.ctx.fillStyle = this.computedStyle.getPropertyValue('--muted');
             } else {
@@ -209,8 +209,8 @@ export default class wcCanvas extends HTMLElement {
             this.ctx.font = `${fontSize}px monospace`;
 
             const textWidth = Math.floor(this.ctx.measureText(title).width);
-            const textX = vertex.canvas.x - textWidth / 2;
-            const textY = vertex.canvas.y + vertex.canvas.size + fontSize * 1.5;
+            const textX = vertex._canvas.x - textWidth / 2;
+            const textY = vertex._canvas.y + vertex._canvas.size + fontSize * 1.5;
             this.ctx.fillText(title, textX, textY);
         });
     }
@@ -306,26 +306,24 @@ export default class wcCanvas extends HTMLElement {
             // left mouse button
             case 0:
                 const {originalX, originalY} = this.getCartesianCoordinates(event);
-        
-                for (const vertex of this.vertices) {
-                    const dx = originalX - vertex.canvas.x;
-                    const dy = originalY - vertex.canvas.y;
-        
-                    if (dx * dx + dy * dy < vertex.canvas.size * vertex.canvas.size) {
 
-                        if (!vertex.canvas.selected) {
-                            this.vertices.forEach(v => v.canvas.selected = false);
-                            vertex.canvas.selected = true;
+                for (const vertex of this.vertices) {
+                    const dx = originalX - vertex._canvas.x;
+                    const dy = originalY - vertex._canvas.y;
+        
+                    if (dx * dx + dy * dy < vertex._canvas.size * vertex._canvas.size) {
+                        if (!vertex._canvas.selected) {
+                            this.vertices.forEach(v => v._canvas.selected = false);
+                            vertex._canvas.selected = true;
                         }
-                        
-                        this.drawGraph();
                         break;
                     } else {
-                        this.vertices.forEach(v => v.canvas.selected = false);
-                        this.drawGraph();
+                        this.vertices.forEach(v => v._canvas.selected = false);
                     }
                 }
 
+                // redraw canvas after the loop
+                this.drawGraph();
                 break;
 
             // middle mouse button
@@ -377,10 +375,10 @@ export default class wcCanvas extends HTMLElement {
             case 0:
                 // check if the click is near a vertex
                 for (const vertex of this.vertices) {
-                    const dx = originalX - vertex.canvas.x;
-                    const dy = originalY - vertex.canvas.y;
+                    const dx = originalX - vertex._canvas.x;
+                    const dy = originalY - vertex._canvas.y;
 
-                    if (dx * dx + dy * dy < vertex.canvas.size * vertex.canvas.size) {
+                    if (dx * dx + dy * dy < vertex._canvas.size * vertex._canvas.size) {
                         // action here
                         break;
                     }

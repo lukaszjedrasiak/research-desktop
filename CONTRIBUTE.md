@@ -17,3 +17,4 @@
 * preview: preview frontendprocess
 * pageName: frontend process
 * renderer: renderer process
+* wcComponentName: webcomponent

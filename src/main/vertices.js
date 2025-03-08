@@ -47,8 +47,8 @@ async function processVertices(graphPath, graphItems) {
         const frontmatterSchemaValid = await validateSchema(SCHEMA_VERTEX_YAML_COMPOUND, frontmatterParsed);
         if (!frontmatterSchemaValid) continue;
 
-        frontmatterParsed.title = {};
-        frontmatterParsed.slug = {};
+        frontmatterParsed._title = {};
+        frontmatterParsed._slug = {};
 
         const indexFiles = vertexFolderItems.filter(file => file.startsWith('index.') && file.endsWith('.md'));
         if (indexFiles.length === 0) continue;
@@ -67,8 +67,8 @@ async function processVertices(graphPath, graphItems) {
             if (!indexFileYamlSchemaValid) continue;
 
             const indexLanguage = indexFile.split('.')[1];
-            frontmatterParsed.title[indexLanguage] = indexFileYamlParsed.title;
-            frontmatterParsed.slug[indexLanguage] = indexFileYamlParsed.slug;
+            frontmatterParsed._title[indexLanguage] = indexFileYamlParsed._title;
+            frontmatterParsed._slug[indexLanguage] = indexFileYamlParsed._slug;
         }
 
         vertices.push(frontmatterParsed);
@@ -112,12 +112,13 @@ async function vertexCreate() {
 
         // create graph.yaml
         const graphYamlObject = {
-            uuid: crypto.randomUUID(),
-            type: 'permanent',
-            visibility: 'private',
-            created: new Date().toISOString(),
-            modified: new Date().toISOString(),
-            canvas: {
+            _uuid: crypto.randomUUID(),
+            _graph: currentGraph._uuid,
+            _type: 'permanent',
+            _visibility: 'private',
+            _created: new Date().toISOString(),
+            _modified: new Date().toISOString(),
+            _canvas: {
                 x: 0,
                 y: 0,
                 library: 'material-symbols-rounded',
@@ -126,7 +127,7 @@ async function vertexCreate() {
                 fill: '--primary',
                 stroke: null
             },
-            edges: {
+            _edges: {
                 'parent': [],
                 'sibling': []
             }
@@ -140,8 +141,8 @@ async function vertexCreate() {
         // create index files
         for (const singleLanguage of currentGraph.languages.all) {
             const indexYamlObject = {
-                title: vertexName,
-                slug: vertexName
+                _title: vertexName,
+                _slug: vertexName
             }
 
             const indexYamlString = await jsonToYaml(indexYamlObject);

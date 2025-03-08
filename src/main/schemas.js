@@ -2,6 +2,7 @@ const z = require('zod');
 const ISO6391 = require('iso-639-1');
 
 const SCHEMA_GRAPH_YAML = z.object({
+    uuid: z.string().uuid(),
     languages: z.object({
         default: z.string()
             .refine(code => ISO6391.validate(code), {
@@ -17,31 +18,34 @@ const SCHEMA_GRAPH_YAML = z.object({
 });
 
 const SCHEMA_VERTEX_YAML_COMPOUND = z.object({
-    uuid: z.string().uuid(),
-    type: z.enum(['permanent', 'fleeting', 'literature', 'source']),
-    visibility: z.enum(['public', 'private']),
+    _uuid: z.string().uuid(),
+    _graph: z.string().uuid(),
+    _type: z.enum(['permanent', 'fleeting', 'literature', 'source']),
+    _visibility: z.enum(['public', 'private']),
     
-    created: z.coerce.date().or(z.string().datetime()),
-    modified: z.coerce.date().or(z.string().datetime()),
+    _created: z.coerce.date().or(z.string().datetime()),
+    _modified: z.coerce.date().or(z.string().datetime()),
     
-    canvas: z.object({
+    _canvas: z.object({
         x: z.number(),
         y: z.number(),
+        library: z.string(),
+        icon: z.string(),
         size: z.number().int().positive(),
         fill: z.string(),
         stroke: z.string().nullable()
     }),
 
-    edges: z.record(
+    _edges: z.record(
         z.string(), // any string key for link type
         z.array(z.string().uuid())
     ).optional()
-})
+}).passthrough()
 
 const SCHEMA_VERTEX_YAML_INDEX = z.object({
-    title: z.string(),
-    slug: z.string()
-})
+    _title: z.string(),
+    _slug: z.string()
+}).passthrough()
 
 module.exports = {
     SCHEMA_GRAPH_YAML,
