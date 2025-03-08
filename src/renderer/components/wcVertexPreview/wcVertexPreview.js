@@ -91,11 +91,21 @@ export default class wcVertexPreview extends HTMLElement {
     }
 
     async showDialog(vertex) {
+        console.log(`%c # showDialog(${vertex._uuid})`, 'color: lightblue');
+
         try {
             const graphData = await window.api_internal.getGraphData();
             this.currentLanguage = graphData.languages.default;
         } catch (error) {
             console.error('Error fetching graph data:', error);
+        }
+
+        try {
+            const vertexData = await window.api_internal.getVertex(vertex._uuid);
+            const elContent = this.shadowRoot.querySelector('#content');
+            elContent.innerHTML = vertexData.content[this.currentLanguage];
+        } catch (error) {
+            console.error('Error fetching vertex:', error);
         }
 
         const vertexTitle = this.shadowRoot.querySelector('h1');

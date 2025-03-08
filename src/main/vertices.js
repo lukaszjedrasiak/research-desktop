@@ -31,6 +31,10 @@ ipcMain.handle('vertices-get', () => {
     return gVertices.get();
 });
 
+ipcMain.handle('vertex-get', (event, uuid) => {
+    return vertexGet(uuid);
+});
+
 // main functions
 async function processVertices(graphPath, graphItems) {
     console.log(chalk.blue('# processVertices()'));
@@ -177,7 +181,31 @@ async function vertexCreate() {
     return null;
 }
 
+async function vertexGet(uuid) {
+    console.log(chalk.blue(`# vertexGet(${uuid})`));
+    const vertices = gVertices.get();
+    const vertexFound = vertices.find(vertex => vertex._uuid === uuid);
+    if (!vertexFound) return null;
+
+    vertexFound.content = {};
+
+    const indexFiles = await fs.readdir(vertexFound.path);
+    const indexFilesFiltered = indexFiles.filter(file => file.startsWith('index.') && file.endsWith('.md'));
+    if (indexFilesFiltered.length === 0) return null;
+
+    for (const indexFile of indexFilesFiltered) {
+        const indexFilePath = path.join(vertexFound.path, indexFile);
+        const indexFileLanguage = indexFile.split('.')[1];
+        const indexFileRaw = await fs.readFile(indexFilePath, 'utf8');
+
+        vertexFound.content[indexFileLanguage] = indexFileRaw;
+    }
+
+    return vertexFound;
+}
+
 module.exports = {
     processVertices,
-    vertexCreate
+    vertexCreate,
+    vertexGet
 };

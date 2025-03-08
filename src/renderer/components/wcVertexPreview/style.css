@@ -19,6 +19,16 @@ dialog {
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
+    
+    /* Layout for content */
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+/* Ensure dialog is hidden by default */
+dialog:not([open]) {
+    display: none;
 }
 
 #header {
@@ -46,6 +56,44 @@ dialog {
     gap: 0.5rem;
     font-family: monospace;
     font-size: 0.75rem;
+}
+
+/* Create a content wrapper to handle the border and border-radius */
+.content-wrapper {
+    border: 1px solid var(--layer);
+    border-radius: 0.5rem;
+    flex: 1;
+    overflow: hidden; /* Hide overflow at the wrapper level */
+    position: relative;
+}
+
+#content {
+    color: var(--placeholder);
+    font-family: monospace;
+    white-space: pre-wrap;
+    line-height: 1.5;
+    
+    /* Move scrolling to content */
+    overflow-y: auto;
+    padding: 1rem;
+    
+    /* Make content fill the wrapper */
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    
+    /* Scrollbar styling */
+    scrollbar-width: thin;
+    scrollbar-color: var(--border) var(--container);
+}
+
+/* Remove the WebKit scrollbar styling - it's inconsistent */
+#content::-webkit-scrollbar,
+#content::-webkit-scrollbar-track,
+#content::-webkit-scrollbar-thumb {
+    display: none;
 }
 
 h1 {
