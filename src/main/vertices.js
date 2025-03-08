@@ -88,6 +88,8 @@ async function processVertices(graphPath, graphItems) {
             frontmatterParsed._slug[indexLanguage] = indexFileYamlParsed._slug;
         }
 
+        frontmatterParsed.path = vertexFolderPath;
+
         vertices.push(frontmatterParsed);
     }
 
