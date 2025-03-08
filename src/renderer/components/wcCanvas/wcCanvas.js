@@ -381,7 +381,8 @@ export default class wcCanvas extends HTMLElement {
                     const dy = originalY - vertex._canvas.y;
 
                     if (dx * dx + dy * dy < vertex._canvas.size * vertex._canvas.size) {
-                        // action here
+                        const vertexPreview = document.querySelector('wc-vertex-preview');
+                        vertexPreview.showDialog(vertex);
                         break;
                     }
                 }

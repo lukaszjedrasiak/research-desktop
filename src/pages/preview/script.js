@@ -1,6 +1,7 @@
 console.log('# pages/preview/script.js');
 
 import wcCanvas from '../../renderer/components/wcCanvas/wcCanvas.js';
+import wcVertexPreview from '../../renderer/components/wcVertexPreview/wcVertexPreview.js';
 
 document.addEventListener('DOMContentLoaded', async () => {
     const graphData = await window.api_internal.getGraphData();
