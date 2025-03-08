@@ -10,11 +10,28 @@ const { SCHEMA_VERTEX_YAML_COMPOUND, SCHEMA_VERTEX_YAML_INDEX } = require('./sch
 
 chalk.level = 2;
 
+
+// global objects
+const gVertices = {
+    data: null,
+    set: function(vertices) {
+        this.data = vertices;
+    },
+    get: function() {
+        return this.data;
+    }
+}
+
 // IPC
 ipcMain.handle('vertex-create', () => {
     return vertexCreate();
 });
 
+ipcMain.handle('vertices-get', () => {
+    return gVertices.get();
+});
+
+// main functions
 async function processVertices(graphPath, graphItems) {
     console.log(chalk.blue('# processVertices()'));
     const vertices = [];
@@ -74,6 +91,7 @@ async function processVertices(graphPath, graphItems) {
         vertices.push(frontmatterParsed);
     }
 
+    gVertices.set(vertices);
     return vertices;
 }
 

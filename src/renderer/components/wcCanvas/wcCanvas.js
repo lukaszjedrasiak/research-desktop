@@ -69,7 +69,8 @@ export default class wcCanvas extends HTMLElement {
     async loadData() {
         try {
             const graphData = await window.api_internal.getGraphData();
-            this.vertices = graphData.vertices;
+            //this.vertices = graphData.vertices;
+            this.vertices = await window.api_internal.getVertices();
             this.edges = graphData.edges;
             this.currentLanguage = graphData.languages.default;
         } catch(error) {
