@@ -170,7 +170,7 @@ async function graphOpen() {
             //language: researchFolderGraphYamlContentParsed.language || 'en',
             languages: researchFolderGraphYamlContentParsed.languages,
             //vertices: vertices,
-            edges: edges,
+            //edges: edges,
             //items: graphItemsClassified
         });
 
@@ -309,7 +309,7 @@ async function graphReload() {
             //language: researchFolderGraphYamlContentParsed.language || 'en',
             languages: researchFolderGraphYamlContentParsed.languages,
             //vertices: vertices,
-            edges: edges,
+            //edges: edges,
             //items: graphItemsClassified
         });
 

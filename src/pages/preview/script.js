@@ -14,4 +14,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     const vertices = await window.api_internal.getVertices();
     console.log(`%c# vertices`, 'color: lightblue');
     console.log(`%c${JSON.stringify(vertices, null, 2)}`, 'color: plum');
+
+    const edges = await window.api_internal.getEdges();
+    console.log(`%c# edges`, 'color: lightblue');
+    console.log(`%c${JSON.stringify(edges, null, 2)}`, 'color: plum');
 });

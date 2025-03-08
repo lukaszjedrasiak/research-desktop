@@ -6,4 +6,5 @@ contextBridge.exposeInMainWorld('api_internal', {
     getGraphData: () => ipcRenderer.invoke('graph-get'),
     getGraphItems: () => ipcRenderer.invoke('graphItems-get'),
     getVertices: () => ipcRenderer.invoke('vertices-get'),
+    getEdges: () => ipcRenderer.invoke('edges-get'),
 });
