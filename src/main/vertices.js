@@ -108,6 +108,7 @@ async function vertexCreate() {
     const { graphGet, graphReload } = require('./graph');
 
     const currentGraph = graphGet();
+    console.log(currentGraph);
 
     if (!currentGraph) {
         dialog.showMessageBox({
@@ -137,7 +138,7 @@ async function vertexCreate() {
         // create graph.yaml
         const graphYamlObject = {
             _uuid: crypto.randomUUID(),
-            _graph: currentGraph._uuid,
+            _graph: currentGraph.uuid,
             _type: 'permanent',
             _visibility: 'private',
             _created: new Date().toISOString(),

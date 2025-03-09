@@ -168,6 +168,7 @@ async function graphOpen() {
         oGraph.set({
             path: path.normalize(graphPath),
             //language: researchFolderGraphYamlContentParsed.language || 'en',
+            uuid: researchFolderGraphYamlContentParsed.uuid,
             languages: researchFolderGraphYamlContentParsed.languages,
             //vertices: vertices,
             //edges: edges,
