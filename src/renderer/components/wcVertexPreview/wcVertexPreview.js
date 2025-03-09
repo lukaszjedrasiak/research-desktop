@@ -5,11 +5,13 @@ export default class wcVertexPreview extends HTMLElement {
     }
 
     async connectedCallback() {
+        console.log(`%c # connectedCallback()`, 'color: lightblue');
         await this.initialize();
         await this.attachEventListeners();
     }
 
     async disconnectedCallback() {
+        console.log(`%c # disconnectedCallback()`, 'color: lightblue');
         await this.detachEventListeners();
     }
 
@@ -100,10 +102,11 @@ export default class wcVertexPreview extends HTMLElement {
             console.error('Error fetching graph data:', error);
         }
 
+        // get vertex content
         try {
-            const vertexData = await window.api_internal.getVertex(vertex._uuid);
+            const vertexContent = await window.api_internal.vertexGetContent(vertex._uuid);
             const elContent = this.shadowRoot.querySelector('#content');
-            elContent.innerHTML = vertexData.content[this.currentLanguage];
+            elContent.innerHTML = vertexContent[this.currentLanguage];
         } catch (error) {
             console.error('Error fetching vertex:', error);
         }
