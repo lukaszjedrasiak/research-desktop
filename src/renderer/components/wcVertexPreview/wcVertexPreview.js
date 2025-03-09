@@ -17,12 +17,15 @@ export default class wcVertexPreview extends HTMLElement {
 
     async attachEventListeners() {
         this.boundCloseDialog = this.closeDialog.bind(this);
-        
+        this.boundSetLanguage = this.setLanguage.bind(this);
+
         this.shadowRoot.querySelector('#close').addEventListener('click', this.boundCloseDialog);
+        this.shadowRoot.querySelector('#languages').addEventListener('click', this.boundSetLanguage);
     }
 
     async detachEventListeners() {
         this.shadowRoot.querySelector('#close').removeEventListener('click', this.boundCloseDialog);
+        this.shadowRoot.querySelector('#languages').removeEventListener('click', this.boundSetLanguage);
     }
 
     async initialize() {
@@ -97,30 +100,51 @@ export default class wcVertexPreview extends HTMLElement {
 
         try {
             const graphData = await window.api_internal.getGraphData();
-            this.currentLanguage = graphData.languages.default;
+            this.languageCurrent = graphData.languages.default;
+            this.languagesAll = graphData.languages.all;
+
+            const elLanguages = this.shadowRoot.querySelector('#languages');
+            elLanguages.innerHTML = this.languagesAll.map(language => `<span class="language">${language}</span>`).join('');
         } catch (error) {
             console.error('Error fetching graph data:', error);
         }
 
-        // get vertex content
+        // get vertex data+content
         try {
-            const vertexContent = await window.api_internal.vertexGetContent(vertex._uuid);
+            this.vertexData = vertex;
+            this.vertexContent = await window.api_internal.vertexGetContent(this.vertexData._uuid);
+
             const elContent = this.shadowRoot.querySelector('#content');
-            elContent.innerHTML = vertexContent[this.currentLanguage];
+            elContent.innerHTML = this.vertexContent[this.languageCurrent];
         } catch (error) {
             console.error('Error fetching vertex:', error);
         }
 
-        const vertexTitle = this.shadowRoot.querySelector('h1');
-        vertexTitle.textContent = vertex._title[this.currentLanguage];
+        // display content
+        this.displayContent();
         this.dialog.showModal();
-
-        const vertexPath = this.shadowRoot.querySelector('#path');
-        vertexPath.textContent = `path: ${vertex.path}`;
     }
 
     closeDialog() {
         this.dialog.close();
+    }
+
+    setLanguage(event) {
+        if (event.target.classList.contains('language')) {
+            this.languageCurrent = event.target.textContent;
+            this.displayContent();
+        }
+    }
+
+    displayContent() {
+        const elContent = this.shadowRoot.querySelector('#content');
+        elContent.innerHTML = this.vertexContent[this.languageCurrent];
+
+        const elTitle = this.shadowRoot.querySelector('h1');
+        elTitle.textContent = this.vertexData._title[this.languageCurrent];
+
+        const vertexPath = this.shadowRoot.querySelector('#path');
+        vertexPath.textContent = `path: ${this.vertexData.path}`;
     }
 }
 

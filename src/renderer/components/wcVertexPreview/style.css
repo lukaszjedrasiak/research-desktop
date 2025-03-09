@@ -40,6 +40,21 @@ dialog:not([open]) {
 
 #header #actions {
     display: flex;
+    gap: 1rem;
+}
+
+#header #actions #languages {
+    display: flex;
+    gap: 0.5rem;
+}
+
+#header #actions #languages .language {
+    cursor: pointer;
+    color: var(--muted);
+}
+
+#header #actions #languages .language:hover {
+    color: var(--font);
 }
 
 #metadata {
