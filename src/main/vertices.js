@@ -10,11 +10,32 @@ const { SCHEMA_VERTEX_YAML_COMPOUND, SCHEMA_VERTEX_YAML_INDEX } = require('./sch
 
 chalk.level = 2;
 
+
+// global objects
+const gVertices = {
+    data: null,
+    set: function(vertices) {
+        this.data = vertices;
+    },
+    get: function() {
+        return this.data;
+    }
+}
+
 // IPC
 ipcMain.handle('vertex-create', () => {
     return vertexCreate();
 });
 
+ipcMain.handle('vertices-get', () => {
+    return gVertices.get();
+});
+
+ipcMain.handle('vertex-get-content', (event, uuid) => {
+    return vertexGetContent(uuid);
+});
+
+// main functions
 async function processVertices(graphPath, graphItems) {
     console.log(chalk.blue('# processVertices()'));
     const vertices = [];
@@ -71,9 +92,12 @@ async function processVertices(graphPath, graphItems) {
             frontmatterParsed._slug[indexLanguage] = indexFileYamlParsed._slug;
         }
 
+        frontmatterParsed.path = vertexFolderPath;
+
         vertices.push(frontmatterParsed);
     }
 
+    gVertices.set(vertices);
     return vertices;
 }
 
@@ -84,6 +108,7 @@ async function vertexCreate() {
     const { graphGet, graphReload } = require('./graph');
 
     const currentGraph = graphGet();
+    console.log(currentGraph);
 
     if (!currentGraph) {
         dialog.showMessageBox({
@@ -113,7 +138,7 @@ async function vertexCreate() {
         // create graph.yaml
         const graphYamlObject = {
             _uuid: crypto.randomUUID(),
-            _graph: currentGraph._uuid,
+            _graph: currentGraph.uuid,
             _type: 'permanent',
             _visibility: 'private',
             _created: new Date().toISOString(),
@@ -155,6 +180,29 @@ async function vertexCreate() {
     }
     
     return null;
+}
+
+async function vertexGetContent(uuid) {
+    console.log(chalk.blue(`# vertexGetContent(${uuid})`));
+    const vertices = gVertices.get();
+    const vertexFound = vertices.find(vertex => vertex._uuid === uuid);
+    if (!vertexFound) return null;
+
+    const vertexContent = {};
+
+    const indexFiles = await fs.readdir(vertexFound.path);
+    const indexFilesFiltered = indexFiles.filter(file => file.startsWith('index.') && file.endsWith('.md'));
+    if (indexFilesFiltered.length === 0) return null;
+
+    for (const indexFile of indexFilesFiltered) {
+        const indexFilePath = path.join(vertexFound.path, indexFile);
+        const indexFileLanguage = indexFile.split('.')[1];
+        const indexFileRaw = await fs.readFile(indexFilePath, 'utf8');
+
+        vertexContent[indexFileLanguage] = indexFileRaw;
+    }
+
+    return vertexContent;
 }
 
 module.exports = {

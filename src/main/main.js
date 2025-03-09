@@ -34,6 +34,10 @@ const createWindow = () => {
             mode: 'dock',
             activate: true
         });
+
+        win.webContents.on('context-menu', (e, params) => {
+            win.webContents.inspectElement(params.x, params.y)
+        })
     }
 }
 

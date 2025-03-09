@@ -1,7 +1,25 @@
+const { ipcMain } = require('electron');
 const chalk = require('chalk');
 
 chalk.level = 2;
 
+// global objects
+const gEdges = {
+    data: null,
+    set: function(edges) {
+        this.data = edges;
+    },
+    get: function() {
+        return this.data;
+    }
+}
+
+// IPC
+ipcMain.handle('edges-get', () => {
+    return gEdges.get();
+});
+
+// main functions
 async function processEdges(vertices) {
     console.log(chalk.blue('# processEdges()'));
     const edges = [];
@@ -26,6 +44,7 @@ async function processEdges(vertices) {
             }
         }
     }
+    gEdges.set(edges);
     return edges;
 }
 

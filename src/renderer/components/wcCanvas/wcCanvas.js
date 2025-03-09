@@ -69,8 +69,10 @@ export default class wcCanvas extends HTMLElement {
     async loadData() {
         try {
             const graphData = await window.api_internal.getGraphData();
-            this.vertices = graphData.vertices;
-            this.edges = graphData.edges;
+            //this.vertices = graphData.vertices;
+            this.vertices = await window.api_internal.getVertices();
+            //this.edges = graphData.edges;
+            this.edges = await window.api_internal.getEdges();
             this.currentLanguage = graphData.languages.default;
         } catch(error) {
             console.error('Error fetching graph data:', error);
@@ -379,7 +381,8 @@ export default class wcCanvas extends HTMLElement {
                     const dy = originalY - vertex._canvas.y;
 
                     if (dx * dx + dy * dy < vertex._canvas.size * vertex._canvas.size) {
-                        // action here
+                        const vertexPreview = document.querySelector('wc-vertex-preview');
+                        vertexPreview.showDialog(vertex);
                         break;
                     }
                 }

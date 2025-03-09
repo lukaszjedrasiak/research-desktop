@@ -32,6 +32,16 @@ const oGraph = {
     }
 };
 
+const gItems = {
+    data: null,
+    set: function(items) {
+        this.data = items;
+    },
+    get: function() {
+        return this.data;
+    }
+}
+
 const IGNORE_ITEMS = [
     '.git',
     '.gitignore',
@@ -52,6 +62,10 @@ ipcMain.handle('graph-reload', () => {
 
 ipcMain.handle('graph-close', () => {
     return graphClose();
+});
+
+ipcMain.handle('graphItems-get', () => {
+    return gItems.get();
 });
 
 // main function
@@ -154,11 +168,14 @@ async function graphOpen() {
         oGraph.set({
             path: path.normalize(graphPath),
             //language: researchFolderGraphYamlContentParsed.language || 'en',
+            uuid: researchFolderGraphYamlContentParsed.uuid,
             languages: researchFolderGraphYamlContentParsed.languages,
-            vertices: vertices,
-            edges: edges,
-            items: graphItemsClassified
+            //vertices: vertices,
+            //edges: edges,
+            //items: graphItemsClassified
         });
+
+        gItems.set(graphItemsClassified);
 
         //console.log(chalk.magenta(JSON.stringify(oGraph.get(), null, 2)));
         const mainWindow = BrowserWindow.getFocusedWindow();
@@ -292,10 +309,12 @@ async function graphReload() {
             path: path.normalize(graphPath),
             //language: researchFolderGraphYamlContentParsed.language || 'en',
             languages: researchFolderGraphYamlContentParsed.languages,
-            vertices: vertices,
-            edges: edges,
-            items: graphItemsClassified
+            //vertices: vertices,
+            //edges: edges,
+            //items: graphItemsClassified
         });
+
+        gItems.set(graphItemsClassified);
 
         // Reload the preview
         const mainWindow = BrowserWindow.getFocusedWindow();
