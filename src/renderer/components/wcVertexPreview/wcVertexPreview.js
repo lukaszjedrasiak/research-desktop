@@ -145,6 +145,9 @@ export default class wcVertexPreview extends HTMLElement {
 
         const vertexPath = this.shadowRoot.querySelector('#path');
         vertexPath.textContent = `path: ${this.vertexData.path}`;
+
+        const vertexUuid = this.shadowRoot.querySelector('#uuid');
+        vertexUuid.textContent = `uuid: ${this.vertexData._uuid}`;
     }
 }
 
