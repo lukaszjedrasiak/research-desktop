@@ -39,7 +39,9 @@ const SCHEMA_VERTEX_YAML_COMPOUND = z.object({
     _edges: z.record(
         z.string(), // any string key for link type
         z.array(z.string().uuid())
-    ).optional()
+    ).optional(),
+
+    _link: z.string().optional(),
 }).passthrough()
 
 const SCHEMA_VERTEX_YAML_INDEX = z.object({
