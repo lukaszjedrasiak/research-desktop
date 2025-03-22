@@ -105,10 +105,10 @@ async function vertexCreate() {
     console.log(chalk.blue('# vertexCreate()'));
 
     // internal imports
-    const { graphGet, graphReload } = require('./graph');
+    const { graphGet, graphOpenReload } = require('./graph');
 
     const currentGraph = graphGet();
-    console.log(currentGraph);
+    //console.log(currentGraph);
 
     if (!currentGraph) {
         dialog.showMessageBox({
@@ -129,7 +129,7 @@ async function vertexCreate() {
 
     if (!result.canceled && result.filePath) {
         const vertexName = path.basename(result.filePath);
-        console.log(chalk.green(`vertexCreate() | name: ${vertexName} | path: ${result.filePath}`));
+        console.log(chalk.green(`# vertexCreate() | name: ${vertexName} | path: ${result.filePath}`));
 
         // create folder
         const vertexFolderPath = path.join(currentGraph.path, vertexName);
@@ -176,7 +176,7 @@ async function vertexCreate() {
             await fs.writeFile(indexFilePath, indexYamlStringFinal);
         }
 
-        graphReload();
+        graphOpenReload('reload');
     }
     
     return null;
