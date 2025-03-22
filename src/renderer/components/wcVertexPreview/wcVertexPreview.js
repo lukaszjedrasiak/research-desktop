@@ -5,7 +5,7 @@ export default class wcVertexPreview extends HTMLElement {
     }
 
     async connectedCallback() {
-        console.log(`%c # connectedCallback()`, 'color: lightblue');
+        console.log(`# connectedCallback()`);
         await this.initialize();
         await this.attachEventListeners();
     }
