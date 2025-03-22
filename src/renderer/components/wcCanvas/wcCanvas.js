@@ -68,14 +68,12 @@ export default class wcCanvas extends HTMLElement {
 
     async loadData() {
         try {
-            const graphData = await window.api_internal.getGraphData();
-            //this.vertices = graphData.vertices;
+            this.graph = await window.api_internal.getGraphData();
+            this.currentLanguage = this.graph.languages.default;
             this.vertices = await window.api_internal.getVertices();
-            //this.edges = graphData.edges;
             this.edges = await window.api_internal.getEdges();
-            this.currentLanguage = graphData.languages.default;
         } catch(error) {
-            console.error('Error fetching graph data:', error);
+            console.error('Error fetching data:', error);
         }
     }
 
@@ -126,7 +124,8 @@ export default class wcCanvas extends HTMLElement {
     async drawVertices(vertices) {
 
         vertices.forEach(async vertex => {
-            await this.drawIcon(vertex._canvas, vertex._canvas.selected);
+            //await this.drawIcon(vertex._canvas, vertex._canvas.selected);
+            await this.drawIcon(vertex);
         });
     }
 
@@ -134,6 +133,8 @@ export default class wcCanvas extends HTMLElement {
         edges.forEach(edge => {
             const from = this.vertices.find(v => v._uuid === edge._from);
             const to = this.vertices.find(v => v._uuid === edge._to);
+
+            if (!from || !to) return;
 
             let currentColor = this.computedStyle.getPropertyValue(edge._canvas.color);
                 
@@ -146,11 +147,22 @@ export default class wcCanvas extends HTMLElement {
             }
 
             this.ctx.beginPath();
+            
+            // Set line style based on edge type
+            if (edge._label === 'sibling') {
+                this.ctx.setLineDash([5, 5]); // Creates a dashed line pattern
+            } else {
+                this.ctx.setLineDash([]); // Solid line
+            }
+
             this.ctx.moveTo(from._canvas.x, from._canvas.y);
             this.ctx.lineTo(to._canvas.x, to._canvas.y);
             this.ctx.strokeStyle = currentColor;
             this.ctx.lineWidth = edge._canvas.width;
             this.ctx.stroke();
+            
+            // Reset line dash to prevent affecting other drawings
+            this.ctx.setLineDash([]);
             
             if (edge._label === 'parent') {
                 this.drawArrows(from, to, currentColor, edge._canvas.width);
@@ -200,6 +212,10 @@ export default class wcCanvas extends HTMLElement {
 
         vertices.forEach(vertex => {
             let title = vertex._title[this.currentLanguage];
+            const iconSize = 
+                vertex._canvas.size ?? 
+                this.graph.vertices.default[vertex._type]?.size ?? 
+                16;
 
             if (!vertex._canvas.selected) {
                 title = title.length > 16 ? title.slice(0, 16).trim() + '…' : title;
@@ -212,7 +228,7 @@ export default class wcCanvas extends HTMLElement {
 
             const textWidth = Math.floor(this.ctx.measureText(title).width);
             const textX = vertex._canvas.x - textWidth / 2;
-            const textY = vertex._canvas.y + vertex._canvas.size + fontSize * 1.5;
+            const textY = vertex._canvas.y + iconSize + fontSize * 1.5;
             this.ctx.fillText(title, textX, textY);
         });
     }
@@ -229,12 +245,37 @@ export default class wcCanvas extends HTMLElement {
         this.ctx.restore();
     }
 
-    async drawIcon(canvas, selected) {
-        const iconColor = this.computedStyle.getPropertyValue(canvas.fill);
-        const strokeColor = this.computedStyle.getPropertyValue(canvas.stroke);
+    async drawIcon(vertex) {
+        //console.log(`drawIcon for vertex: ${vertex._uuid}`);
+
+        // set properties
+        const vertexType = vertex._type;
+
+        const iconLibrary = 
+            vertex._canvas.library ?? 
+            this.graph.vertices.default[vertexType]?.library ?? 
+            'material-symbols-rounded';
+        const iconCode = 
+            vertex._canvas.icon ?? 
+            this.graph.vertices.default[vertexType]?.icon ?? 
+            'error';
+        const iconSize = 
+            vertex._canvas.size ?? 
+            this.graph.vertices.default[vertexType]?.size ?? 
+            16;
+        const iconFill = this.computedStyle.getPropertyValue(
+            vertex._canvas.fill ?? 
+            this.graph.vertices.default[vertexType]?.fill ?? 
+            '--warning'
+        );
+        const iconStroke = this.computedStyle.getPropertyValue(
+            vertex._canvas.stroke ??
+            this.graph.vertices.default[vertexType]?.stroke ??
+            null
+        ); 
         let backgroundColor;
 
-        switch(selected) {
+        switch(vertex._canvas.selected) {
             case true:
                 backgroundColor = this.computedStyle.getPropertyValue('--container');
                 break;
@@ -243,15 +284,15 @@ export default class wcCanvas extends HTMLElement {
                 break;
         }
 
-        switch (canvas.library) {
+        switch (iconLibrary) {
             case 'material-symbols-outlined':
-                this.ctx.font = `normal normal 200 ${canvas.size * 2}px "Material Symbols Outlined"`;
+                this.ctx.font = `normal normal 200 ${iconSize * 2}px "Material Symbols Outlined"`;
                 break;
             case 'material-symbols-rounded':
-                this.ctx.font = `normal normal 200 ${canvas.size * 2}px "Material Symbols Rounded"`;
+                this.ctx.font = `normal normal 200 ${iconSize * 2}px "Material Symbols Rounded"`;
                 break;
             case 'material-symbols-sharp':
-                this.ctx.font = `normal normal 200 ${canvas.size * 2}px "Material Symbols Sharp"`;
+                this.ctx.font = `normal normal 200 ${iconSize * 2}px "Material Symbols Sharp"`;
                 break;
         }
 
@@ -260,15 +301,15 @@ export default class wcCanvas extends HTMLElement {
 
         // draw background
         this.ctx.beginPath();
-        this.ctx.arc(canvas.x, canvas.y, canvas.size * 1.125, 0, 2 * Math.PI);
+        this.ctx.arc(vertex._canvas.x, vertex._canvas.y, iconSize * 1.125, 0, 2 * Math.PI);
         this.ctx.fillStyle = backgroundColor;
         this.ctx.fill();
 
         // draw icon
-        this.ctx.fillStyle = iconColor;
+        this.ctx.fillStyle = iconFill;
         this.ctx.textAlign = 'center';
         this.ctx.textBaseline = 'middle';
-        this.ctx.fillText(canvas.icon, canvas.x, canvas.y + 2.5);
+        this.ctx.fillText(iconCode, vertex._canvas.x, vertex._canvas.y + 2.5);
 
         // restore context
         this.ctx.restore();
@@ -310,10 +351,14 @@ export default class wcCanvas extends HTMLElement {
                 const {originalX, originalY} = this.getCartesianCoordinates(event);
 
                 for (const vertex of this.vertices) {
+                    const iconSize = 
+                        vertex._canvas.size ?? 
+                        this.graph.vertices.default[vertex._type]?.size ?? 
+                        16;
                     const dx = originalX - vertex._canvas.x;
                     const dy = originalY - vertex._canvas.y;
         
-                    if (dx * dx + dy * dy < vertex._canvas.size * vertex._canvas.size) {
+                    if (dx * dx + dy * dy < iconSize * iconSize) {
                         if (!vertex._canvas.selected) {
                             this.vertices.forEach(v => v._canvas.selected = false);
                             vertex._canvas.selected = true;
@@ -375,16 +420,26 @@ export default class wcCanvas extends HTMLElement {
 
         switch (event.button) {
             case 0:
+                let vertexFound = false;
                 // check if the click is near a vertex
                 for (const vertex of this.vertices) {
+                    const iconSize = 
+                        vertex._canvas.size ?? 
+                        this.graph.vertices.default[vertex._type]?.size ?? 
+                        16;
                     const dx = originalX - vertex._canvas.x;
                     const dy = originalY - vertex._canvas.y;
 
-                    if (dx * dx + dy * dy < vertex._canvas.size * vertex._canvas.size) {
+                    if (dx * dx + dy * dy < iconSize * iconSize) {
                         const vertexPreview = document.querySelector('wc-vertex-preview');
                         vertexPreview.showDialog(vertex);
+                        vertexFound = true;
                         break;
                     }
+                }
+
+                if (!vertexFound) {
+                    await window.api_internal.vertexCreate(originalX, originalY);
                 }
         }
     }

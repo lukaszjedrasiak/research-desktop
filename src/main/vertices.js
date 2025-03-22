@@ -23,8 +23,8 @@ const gVertices = {
 }
 
 // IPC
-ipcMain.handle('vertex-create', () => {
-    return vertexCreate();
+ipcMain.handle('vertex-create', (event, x = 0, y = 0) => {
+    return vertexCreate(x, y);
 });
 
 ipcMain.handle('vertices-get', () => {
@@ -101,14 +101,14 @@ async function processVertices(graphPath, graphItems) {
     return vertices;
 }
 
-async function vertexCreate() {
+async function vertexCreate(x = 0, y = 0) {
     console.log(chalk.blue('# vertexCreate()'));
 
     // internal imports
-    const { graphGet, graphReload } = require('./graph');
+    const { graphGet, graphOpenReload } = require('./graph');
 
     const currentGraph = graphGet();
-    console.log(currentGraph);
+    //console.log(currentGraph);
 
     if (!currentGraph) {
         dialog.showMessageBox({
@@ -129,7 +129,7 @@ async function vertexCreate() {
 
     if (!result.canceled && result.filePath) {
         const vertexName = path.basename(result.filePath);
-        console.log(chalk.green(`vertexCreate() | name: ${vertexName} | path: ${result.filePath}`));
+        console.log(chalk.green(`# vertexCreate() | name: ${vertexName} | path: ${result.filePath}`));
 
         // create folder
         const vertexFolderPath = path.join(currentGraph.path, vertexName);
@@ -144,21 +144,18 @@ async function vertexCreate() {
             _created: new Date().toISOString(),
             _modified: new Date().toISOString(),
             _canvas: {
-                x: 0,
-                y: 0,
-                library: 'material-symbols-rounded',
-                icon: 'article',
-                size: 16,
-                fill: '--primary',
-                stroke: null
+                x: x,
+                y: y,
+                //library: 'material-symbols-rounded',
+                //icon: 'article',
+                //size: 16,
+                //fill: '--primary',
+                //stroke: null
             },
-            _edges: {
-                'parent': [],
-                'sibling': []
-            }
         }
 
-        const graphYamlString = await jsonToYaml(graphYamlObject);
+        let graphYamlString = await jsonToYaml(graphYamlObject);
+        graphYamlString += '\n# _edges:\n#   - target: uuid\n#     label: label-name\n#     weight: 1\n';
 
         const graphYamlPath = path.join(vertexFolderPath, 'graph.yaml');
         await fs.writeFile(graphYamlPath, graphYamlString);
@@ -176,7 +173,7 @@ async function vertexCreate() {
             await fs.writeFile(indexFilePath, indexYamlStringFinal);
         }
 
-        graphReload();
+        graphOpenReload('reload');
     }
     
     return null;

@@ -9,4 +9,5 @@ contextBridge.exposeInMainWorld('api_internal', {
     getEdges: () => ipcRenderer.invoke('edges-get'),
 
     vertexGetContent: (uuid) => ipcRenderer.invoke('vertex-get-content', uuid),
+    vertexCreate: (x, y) => ipcRenderer.invoke('vertex-create', x, y)
 });

@@ -27,21 +27,17 @@ async function processEdges(vertices) {
     for (const vertex of vertices) {
         if (!vertex._edges) continue;
 
-        for (const label of Object.keys(vertex._edges)) {
-            if (!vertex._edges[label]?.length) continue;
-
-            for (const edge of vertex._edges[label]) {
-                edges.push({
-                    _from: vertex._uuid,
-                    _to: edge,
-                    _label: label,
-                    _canvas: {
-                        color: '--layer',
-                        width: 1,
-                        weight: 1
-                    }
-                });
-            }
+        for (const edge of vertex._edges) {
+            edges.push({
+                _from: vertex._uuid,
+                _to: edge.target,
+                _label: edge.label,
+                _canvas: {
+                    color: '--layer',
+                    width: edge.weight,
+                    weight: edge.weight
+                }
+            });
         }
     }
     gEdges.set(edges);

@@ -2,7 +2,7 @@ const { Menu } = require('electron');
 const { updateElectronApp } = require('update-electron-app');
 
 // internal imports
-const { graphOpen, graphReload, graphClose } = require('./graph');
+const { graphOpenReload, graphClose } = require('./graph');
 const { vertexCreate } = require('./vertices');
 
 function createMenu() {
@@ -19,16 +19,28 @@ function createMenu() {
     defaultMenuTemplate.unshift({
         label: 'Vertex',
         submenu: [
-            { label: 'New', accelerator: 'CmdOrCtrl+N', click: vertexCreate}
+            { label: 'New', accelerator: 'CmdOrCtrl+N', click: () => vertexCreate(0, 0) }
         ]
     });
 
     defaultMenuTemplate.unshift({
         label: 'Graph',
         submenu: [
-            { label: 'Open (preview)', accelerator: 'CmdOrCtrl+Shift+O', click: graphOpen },
-            { label: 'Reload', accelerator: 'CmdOrCtrl+F5', click: graphReload },
-            { label: 'Close', accelerator: 'CmdOrCtrl+W', click: graphClose }
+            {
+                label: 'Open (preview)', 
+                accelerator: 'CmdOrCtrl+Shift+O', 
+                click: () => graphOpenReload('open')
+            },
+            { 
+                label: 'Reload', 
+                accelerator: 'CmdOrCtrl+F5', 
+                click: () => graphOpenReload('reload')
+            },
+            { 
+                label: 'Close', 
+                accelerator: 'CmdOrCtrl+W', 
+                click: graphClose 
+            }
         ]
     });
 
