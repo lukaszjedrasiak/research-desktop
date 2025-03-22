@@ -47,9 +47,12 @@ const SCHEMA_VERTEX_YAML_COMPOUND = z.object({
         stroke: z.string().nullable().optional()
     }),
 
-    _edges: z.record(
-        z.string(), // any string key for link type
-        z.array(z.string().uuid())
+    _edges: z.array(
+        z.object({
+            target: z.string().uuid(),
+            label: z.string(),
+            weight: z.number().int().positive()
+        })
     ).optional(),
 
     _link: z.string().optional(),
