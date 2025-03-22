@@ -23,8 +23,8 @@ const gVertices = {
 }
 
 // IPC
-ipcMain.handle('vertex-create', () => {
-    return vertexCreate();
+ipcMain.handle('vertex-create', (event, x = 0, y = 0) => {
+    return vertexCreate(x, y);
 });
 
 ipcMain.handle('vertices-get', () => {
@@ -101,7 +101,7 @@ async function processVertices(graphPath, graphItems) {
     return vertices;
 }
 
-async function vertexCreate() {
+async function vertexCreate(x = 0, y = 0) {
     console.log(chalk.blue('# vertexCreate()'));
 
     // internal imports
@@ -144,21 +144,18 @@ async function vertexCreate() {
             _created: new Date().toISOString(),
             _modified: new Date().toISOString(),
             _canvas: {
-                x: 0,
-                y: 0,
+                x: x,
+                y: y,
                 //library: 'material-symbols-rounded',
                 //icon: 'article',
                 //size: 16,
                 //fill: '--primary',
                 //stroke: null
             },
-            _edges: {
-                'parent': [],
-                'sibling': []
-            }
         }
 
-        const graphYamlString = await jsonToYaml(graphYamlObject);
+        let graphYamlString = await jsonToYaml(graphYamlObject);
+        graphYamlString += '\n# _edges:\n#   - target: uuid\n#     label: label-name\n#     weight: 1\n';
 
         const graphYamlPath = path.join(vertexFolderPath, 'graph.yaml');
         await fs.writeFile(graphYamlPath, graphYamlString);

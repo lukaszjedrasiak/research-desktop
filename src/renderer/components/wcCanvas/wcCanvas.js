@@ -147,11 +147,22 @@ export default class wcCanvas extends HTMLElement {
             }
 
             this.ctx.beginPath();
+            
+            // Set line style based on edge type
+            if (edge._label === 'sibling') {
+                this.ctx.setLineDash([5, 5]); // Creates a dashed line pattern
+            } else {
+                this.ctx.setLineDash([]); // Solid line
+            }
+
             this.ctx.moveTo(from._canvas.x, from._canvas.y);
             this.ctx.lineTo(to._canvas.x, to._canvas.y);
             this.ctx.strokeStyle = currentColor;
             this.ctx.lineWidth = edge._canvas.width;
             this.ctx.stroke();
+            
+            // Reset line dash to prevent affecting other drawings
+            this.ctx.setLineDash([]);
             
             if (edge._label === 'parent') {
                 this.drawArrows(from, to, currentColor, edge._canvas.width);
@@ -409,6 +420,7 @@ export default class wcCanvas extends HTMLElement {
 
         switch (event.button) {
             case 0:
+                let vertexFound = false;
                 // check if the click is near a vertex
                 for (const vertex of this.vertices) {
                     const iconSize = 
@@ -421,8 +433,13 @@ export default class wcCanvas extends HTMLElement {
                     if (dx * dx + dy * dy < iconSize * iconSize) {
                         const vertexPreview = document.querySelector('wc-vertex-preview');
                         vertexPreview.showDialog(vertex);
+                        vertexFound = true;
                         break;
                     }
+                }
+
+                if (!vertexFound) {
+                    await window.api_internal.vertexCreate(originalX, originalY);
                 }
         }
     }

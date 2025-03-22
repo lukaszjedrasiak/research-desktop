@@ -19,7 +19,7 @@ function createMenu() {
     defaultMenuTemplate.unshift({
         label: 'Vertex',
         submenu: [
-            { label: 'New', accelerator: 'CmdOrCtrl+N', click: vertexCreate}
+            { label: 'New', accelerator: 'CmdOrCtrl+N', click: () => vertexCreate(0, 0) }
         ]
     });
 
