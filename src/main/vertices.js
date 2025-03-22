@@ -146,11 +146,11 @@ async function vertexCreate() {
             _canvas: {
                 x: 0,
                 y: 0,
-                library: 'material-symbols-rounded',
-                icon: 'article',
-                size: 16,
-                fill: '--primary',
-                stroke: null
+                //library: 'material-symbols-rounded',
+                //icon: 'article',
+                //size: 16,
+                //fill: '--primary',
+                //stroke: null
             },
             _edges: {
                 'parent': [],

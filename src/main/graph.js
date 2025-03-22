@@ -187,6 +187,7 @@ async function graphOpenReload(mode) {
             //language: researchFolderGraphYamlContentParsed.language || 'en',
             uuid: researchFolderGraphYamlContentParsed.uuid,
             languages: researchFolderGraphYamlContentParsed.languages,
+            vertices: researchFolderGraphYamlContentParsed.vertices,
             //vertices: vertices,
             //edges: edges,
             //items: graphItemsClassified
