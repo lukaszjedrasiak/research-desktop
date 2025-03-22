@@ -135,6 +135,8 @@ export default class wcCanvas extends HTMLElement {
             const from = this.vertices.find(v => v._uuid === edge._from);
             const to = this.vertices.find(v => v._uuid === edge._to);
 
+            if (!from || !to) return;
+
             let currentColor = this.computedStyle.getPropertyValue(edge._canvas.color);
                 
             if (edge._label === 'parent' && from._canvas.selected) {
